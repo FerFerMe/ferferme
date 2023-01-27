@@ -6,20 +6,20 @@ const DAY_IN_MILLISECONDS = 1000 * 60 * 60 * 24;
 
 export default {
   api: {
-    root: 'https://candy.freefeed.net',
+    root: 'https://freefeed.net',
   },
 
   siteTitle: 'FreeFeed',
 
-  siteOrigin: 'http://localhost:3333',
+  siteOrigin: 'https://freefeed.net',
 
   auth: {
     tokenPrefix: 'freefeed_',
-    userStorageKey: 'USER_KEY',
+    userStorageKey: 'whoamiCache',
   },
 
   captcha: {
-    siteKey: '',
+    siteKey: '6LdChhITAAAAAGzgvUPPCbg0cxJzcxFc5vlBs9u5',
   },
 
   search: {
@@ -30,29 +30,35 @@ export default {
     // for transform links in the posts, comments, etc.
     'freefeed.net',
     'gamma.freefeed.net',
+    'freefeed.me',
   ],
 
   attachments: { maxCount: 20 },
 
   textFormatter: {
     tldList: TLDs,
-    /**
-     * The format is:
-     * [
-     *  { title: "Telegram", linkTpl: "https://t.me/{}", shortCodes: ["tg", "telegram"] },
-     *  { title: "Twitter", linkTpl: "https://twitter.com/{}", shortCodes: ["tw", "twitter"] },
-     *  ...
-     * ]
-     */
-    foreignMentionServices: [],
-  },
-
-  sentry: {
-    publicDSN: null,
+    foreignMentionServices: [
+      { title: 'Facebook', linkTpl: 'https://www.facebook.com/{}', shortCodes: ['fb', 'facebook'] },
+      { title: 'FreeFeed', linkTpl: 'https://freefeed.net/{}', shortCodes: ['freefeed'] },
+      { title: 'GitHub', linkTpl: 'https://github.com/{}', shortCodes: ['github'] },
+      {
+        title: 'Instagram',
+        linkTpl: 'https://www.instagram.com/{}/',
+        shortCodes: ['ig', 'instagram'],
+      },
+      {
+        title: 'LiveJournal',
+        linkTpl: 'https://users.livejournal.com/{}/',
+        shortCodes: ['lj', 'livejournal'],
+      },
+      { title: 'Mokum', linkTpl: 'https://mokum.place/{}', shortCodes: ['mokum'] },
+      { title: 'Telegram', linkTpl: 'https://t.me/{}', shortCodes: ['tg', 'telegram'] },
+      { title: 'Twitter', linkTpl: 'https://twitter.com/{}', shortCodes: ['twitter'] },
+    ],
   },
 
   frontendPreferences: {
-    clientId: 'net.freefeed',
+    clientId: 'me.freefeed',
     // Use only plain JSON types here. Do not use null values (for type checking).
     defaultValues: {
       displayNames: {
@@ -113,23 +119,24 @@ export default {
   },
 
   // if false, new users are public by default
-  newUsersProtected: false,
+  newUsersProtected: true,
 
   registrationsLimit: {
     emailFormIframeSrc: null,
   },
 
   registrationsByInvite: {
-    formIframeSrc: null,
+    formIframeSrc:
+        'https://docs.google.com/forms/d/e/1FAIpQLSdBzsUIHzR57Ylt2AfUfbIf9Bc03I8Oq2SdQmYqp0s-OsWmnw/viewform',
   },
 
   analytics: {
-    google: null,
+    google: 'UA-240175117-2',
   },
 
   betaChannel: {
     // Set to true to enable 'Use the beta version' switcher in settings
-    enabled: false,
+    enabled: true,
     // Is the current instance is a beta instance?
     isBeta: false,
     subHeading: 'Beta',
