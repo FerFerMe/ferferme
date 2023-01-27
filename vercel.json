@@ -1,3 +1,5 @@
 {"routes": [
-  {"src": "/[^.]+","dest": "/","status": 200}
+  {"src": "/[^.]+","dest": "/","status": 200},
+  {"src": "/config.json","dest": "https://gist.githubusercontent.com/MMDJafari/91b40d9d6c98713103c6cbcdea4db5bb/raw/e8c36e6ee173970b06e6907974041caa743b91fe/config.json","status": 200},
+  {"src": "/version.txt","dest": "https://gist.githubusercontent.com/MMDJafari/23fa5e96d405af744bec0ba6c0fd3964/raw/34fefcd0168e368f39f35974ea71c009881b6e8e/version.txt","status": 200}
 ]}
