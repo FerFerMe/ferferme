@@ -32,6 +32,10 @@ export default {
   registrationsLimit: {
     emailFormIframeSrc: null,
   },
+  registrationsByInvite: {
+    formIframeSrc:
+        'https://docs.google.com/forms/d/e/1FAIpQLSdBzsUIHzR57Ylt2AfUfbIf9Bc03I8Oq2SdQmYqp0s-OsWmnw/viewform',
+  },
   betaChannel: {
     // Set to true to enable 'Use the beta version' switcher in settings
     enabled: false,
@@ -97,7 +101,7 @@ export default {
       readMoreStyle: 'modern',
       homeFeedSort: ACTIVITY,
       homeFeedMode: HOMEFEED_MODE_CLASSIC,
-      homefeed: { hideUsers: [] },
+      homefeed: { hideUsers: [], hideTags: []  },
       hidesInNonHomeFeeds: false,
       pinnedGroups: [],
       hideUnreadNotifications: false,
