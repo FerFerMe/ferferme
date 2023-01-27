@@ -10,14 +10,14 @@ export default {
   },
 
   siteTitle: 'FreeFeed',
-
   siteOrigin: 'https://freefeed.net',
-
   auth: {
     tokenPrefix: 'freefeed_',
     userStorageKey: 'whoamiCache',
   },
-
+  sentry: {
+    publicDSN: 'https://abdac1f2db2d45efaa9142062fe14bd8@sentry.io/75960',
+  },
   captcha: {
     siteKey: '6LdChhITAAAAAGzgvUPPCbg0cxJzcxFc5vlBs9u5',
   },
@@ -25,7 +25,22 @@ export default {
   search: {
     searchEngine: null,
   },
-
+  analytics: {
+    google: 'UA-240175117-2',
+  },
+  newUsersProtected: true,
+  registrationsLimit: {
+    emailFormIframeSrc: null,
+  },
+  betaChannel: {
+    // Set to true to enable 'Use the beta version' switcher in settings
+    enabled: false,
+    // Is the current instance is a beta instance?
+    isBeta: false,
+    subHeading: 'Beta',
+    cookieName: 'beta_channel',
+    cookieValue: '1',
+  },
   siteDomains: [
     // for transform links in the posts, comments, etc.
     'freefeed.net',
@@ -34,7 +49,13 @@ export default {
   ],
 
   attachments: { maxCount: 20 },
+  maxLength: {
+    post: 3000,
+    comment: 3000,
+    description: 1500,
+  },
 
+  minPasswordLength: 9,
   textFormatter: {
     tldList: TLDs,
     foreignMentionServices: [
@@ -76,7 +97,7 @@ export default {
       readMoreStyle: 'modern',
       homeFeedSort: ACTIVITY,
       homeFeedMode: HOMEFEED_MODE_CLASSIC,
-      homefeed: { hideUsers: [], hideTags: [] },
+      homefeed: { hideUsers: [] },
       hidesInNonHomeFeeds: false,
       pinnedGroups: [],
       hideUnreadNotifications: false,
@@ -118,31 +139,7 @@ export default {
     minFolded: 3,
   },
 
-  // if false, new users are public by default
-  newUsersProtected: true,
-
-  registrationsLimit: {
-    emailFormIframeSrc: null,
-  },
-
-  registrationsByInvite: {
-    formIframeSrc:
-        'https://docs.google.com/forms/d/e/1FAIpQLSdBzsUIHzR57Ylt2AfUfbIf9Bc03I8Oq2SdQmYqp0s-OsWmnw/viewform',
-  },
-
-  analytics: {
-    google: 'UA-240175117-2',
-  },
-
-  betaChannel: {
-    // Set to true to enable 'Use the beta version' switcher in settings
-    enabled: true,
-    // Is the current instance is a beta instance?
-    isBeta: false,
-    subHeading: 'Beta',
-    cookieName: 'beta_channel',
-    cookieValue: '1',
-  },
+  // if false, new users are public by default *
 
   eslint: {
     // By default the eslint-linebreak-style directive requires "windows" linebreaks
@@ -151,14 +148,6 @@ export default {
     // to "windows" or "unix".
     linebreakStyle: null,
   },
-
-  maxLength: {
-    post: 3000,
-    comment: 3000,
-    description: 1500,
-  },
-
-  minPasswordLength: 9,
 
   appVersionCheck: {
     // Use real URL/URI here to enable update check
@@ -186,8 +175,6 @@ export default {
       liberaPayProject: null,
       // yasobe.ru project name
       yasobeRuProject: null,
-      // boosty project name
-      boostyProject: null,
     },
   },
 };
