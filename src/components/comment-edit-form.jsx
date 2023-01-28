@@ -185,7 +185,7 @@ export const CommentEditForm = forwardRef(function CommentEditForm(
                 /* eslint-disable-next-line react/jsx-no-bind */
                 onGifClick={(gif) => setGif(gif.url)}
                 theme="auto"
-                tenorApiKey={process.env.TENOR_API_KEY}
+                tenorApiKey={tenor[0].api_key}
               />
             </OverlayPopup>
           </>
