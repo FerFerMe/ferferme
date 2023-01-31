@@ -244,7 +244,6 @@ export default class CreatePost extends Component {
                 /* eslint-disable-next-line react/jsx-no-bind */
                 onClick={() => {
                   this.setState({ gifActive: !this.state.gifActive });
-                  this.textareaRef.current?.focus();
                 }}
               >
                 GIF
@@ -255,6 +254,7 @@ export default class CreatePost extends Component {
                     /* eslint-disable-next-line react/jsx-no-bind */
                     close={() => {
                       this.setState({ gifActive: false });
+                      this.textareaRef.current?.focus();
                     }}
                   >
                     <GifPicker
