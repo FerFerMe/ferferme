@@ -69,7 +69,7 @@ class Post extends Component {
     editingAttachments: [],
     dropzoneDisabled: false,
     unHideOpened: false,
-    gifActive: false,
+    emojiActive: false,
   };
 
   setEmoji = (emoji) => {
