@@ -4,6 +4,7 @@ import cn from 'classnames';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { Portal } from 'react-portal';
+import GifPicker from 'gif-picker-react';
 
 import { faPaperclip, faSmile } from '@fortawesome/free-solid-svg-icons';
 import { initialAsyncState } from '../redux/async-helpers';
@@ -15,8 +16,10 @@ import { ButtonLink } from './button-link';
 import { useUploader, useFileChooser } from './hooks/uploads';
 import { Icon } from './fontawesome-icons';
 import { SubmitModeHint } from './submit-mode-hint';
-import { SubmittableTextarea } from './submittable-textarea';
 import styles from './overlay-popup.module.scss';
+import { SubmittableTextarea } from './mention-textarea';
+import { OverlayPopup } from './overlay-popup';
+import { tenorApiKey } from './tenor-api-key';
 
 export const CommentEditForm = forwardRef(function CommentEditForm(
   {
@@ -32,7 +35,10 @@ export const CommentEditForm = forwardRef(function CommentEditForm(
   const input = useRef(null);
   const [text, setText] = useState(initialText);
   const [emojiActive, setemojiActive] = useState(false);
-  const onChange = useCallback((e) => setText(e.target.value), []);
+  const [gifActive, setgifActive] = useState(false);
+
+  const onChange = useCallback((e) => setText(e), []);
+  
   const canSubmit = useMemo(
     () => !submitStatus.loading && text.trim() !== '',
     [submitStatus.loading, text],
@@ -102,6 +108,11 @@ export const CommentEditForm = forwardRef(function CommentEditForm(
 
   function setEmoji(emoji) {
     setText(`${text}${emoji}`);
+  }
+
+  function setGif(gif) {
+    setText(`${text} ${gif}`);
+    setgifActive(false);
   }
 
   return (
@@ -189,6 +200,34 @@ export const CommentEditForm = forwardRef(function CommentEditForm(
                 </div>
               </div>
             </Portal>
+            </>
+            )}
+        <ButtonLink
+          className="comment-file-button iconic-button"
+          title="Add Gif"
+          /* eslint-disable-next-line react/jsx-no-bind */
+          onClick={() => {
+            setgifActive(!gifActive);
+          }}
+        >
+          GIF
+        </ButtonLink>
+        {gifActive && (
+          <>
+            <OverlayPopup
+              /* eslint-disable-next-line react/jsx-no-bind */
+              close={() => {
+                setgifActive(false);
+                input.current?.focus();
+              }}
+            >
+              <GifPicker
+                /* eslint-disable-next-line react/jsx-no-bind */
+                onGifClick={(gif) => setGif(gif.url)}
+                theme="auto"
+                tenorApiKey={tenorApiKey}
+              />
+            </OverlayPopup>
           </>
         )}
 

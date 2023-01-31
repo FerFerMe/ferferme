@@ -5,6 +5,7 @@ import * as Sentry from '@sentry/react';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { Portal } from 'react-portal';
+import GifPicker from 'gif-picker-react';
 
 import { faPaperclip, faSmile } from '@fortawesome/free-solid-svg-icons';
 import { preventDefault } from '../utils';
@@ -18,8 +19,10 @@ import { Throbber } from './throbber';
 import { Icon } from './fontawesome-icons';
 import { ButtonLink } from './button-link';
 import { MoreWithTriangle } from './more-with-triangle';
-import { SubmittableTextarea } from './submittable-textarea';
 import styles from './overlay-popup.module.scss';
+import { SubmittableTextarea } from './mention-textarea';
+import { OverlayPopup } from './overlay-popup';
+import { tenorApiKey } from './tenor-api-key';
 
 const attachmentsMaxCount = CONFIG.attachments.maxCount;
 
@@ -32,6 +35,7 @@ const getDefaultState = (invitation = '') => ({
   attachments: [],
   dropzoneDisabled: false,
   emojiActive: false,
+  gifActive: false,
 });
 
 export default class CreatePost extends Component {
@@ -45,6 +49,11 @@ export default class CreatePost extends Component {
 
   setEmoji = (emoji) => {
     this.setState({ postText: `${this.state.postText}${emoji}` });
+    };
+    
+  setGif = (gif) => {
+    this.setState({ postText: `${this.state.postText} ${gif}` });
+    this.setState({ gifActive: false });
   };
 
   createPost = () => {
@@ -137,7 +146,7 @@ export default class CreatePost extends Component {
   };
 
   onPostTextChange = (e) => {
-    this.setState({ postText: e.target.value }, this.checkCreatePostAvailability);
+    this.setState({ postText: e }, this.checkCreatePostAvailability);
   };
 
   attLoadingStarted = () => this.setState({ attLoading: true });
@@ -243,6 +252,35 @@ export default class CreatePost extends Component {
                 role="button"
                 /* eslint-disable-next-line react/jsx-no-bind */
                 onClick={() => {
+                  this.setState({ gifActive: !this.state.gifActive });
+                }}
+              >
+                GIF
+              </span>
+              {this.state.gifActive && (
+                <>
+                  <OverlayPopup
+                    /* eslint-disable-next-line react/jsx-no-bind */
+                    close={() => {
+                      this.setState({ gifActive: false });
+                      this.textareaRef.current?.focus();
+                    }}
+                  >
+                    <GifPicker
+                      /* eslint-disable-next-line react/jsx-no-bind */
+                      onGifClick={(gif) => this.setGif(gif.url)}
+                      theme="auto"
+                      tenorApiKey={tenorApiKey}
+                    />
+                  </OverlayPopup>
+                </>
+              )}
+              {' | '}
+              <span
+                className="post-edit-attachments"
+                role="button"
+                /* eslint-disable-next-line react/jsx-no-bind */
+                onClick={() => {
                   this.setState({ emojiActive: !this.state.emojiActive });
                 }}
               >
@@ -267,8 +305,9 @@ export default class CreatePost extends Component {
                       </div>
                     </div>
                   </Portal>
-                </>
+                    </>
               )}
+
               <ButtonLink className="post-edit-more-trigger" onClick={this.toggleMore}>
                 <MoreWithTriangle />
               </ButtonLink>

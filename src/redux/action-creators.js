@@ -1256,3 +1256,20 @@ export function getInvitationsInfo() {
     payload: {},
   };
 }
+export function getSingleComment(commentId) {
+  return {
+    type: ActionTypes.GET_SINGLE_COMMENT,
+    apiRequest: Api.getSingleComment,
+    nonAuthRequest: true,
+    payload: { commentId },
+  };
+}
+
+export function getSinglePostBody(postId) {
+  return {
+    type: ActionTypes.GET_SINGLE_POST_BODY,
+    apiRequest: Api.getPost,
+    nonAuthRequest: true,
+    payload: { postId },
+  };
+}

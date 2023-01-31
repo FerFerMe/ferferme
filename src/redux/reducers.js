@@ -410,6 +410,10 @@ export function postsViewState(state = {}, action) {
       const { id } = action.payload.posts;
       return { ...state, [id]: initPostViewState(action.payload.posts) };
     }
+    case response(ActionTypes.GET_SINGLE_POST_BODY): {
+      const { id } = action.payload.posts;
+      return { ...state, [id]: initPostViewState(action.payload.posts) };
+    }
     case ActionTypes.REALTIME_POST_NEW:
     case ActionTypes.REALTIME_POST_UPDATE: {
       const { id } = action.post;
@@ -713,6 +717,16 @@ export function comments(state = {}, action) {
       return updateCommentData(state, action);
     }
     case response(ActionTypes.GET_COMMENT_BY_NUMBER): {
+      return {
+        ...state,
+        [action.payload.comments.id]: {
+          ...state[action.payload.comments.id],
+          ...action.payload.comments,
+          isExpanded: true,
+        },
+      };
+    }
+    case response(ActionTypes.GET_SINGLE_COMMENT): {
       return {
         ...state,
         [action.payload.comments.id]: {
