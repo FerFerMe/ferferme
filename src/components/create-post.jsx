@@ -2,9 +2,12 @@
 import { Component, createRef } from 'react';
 import _ from 'lodash';
 import * as Sentry from '@sentry/react';
+import data from '@emoji-mart/data';
+import Picker from '@emoji-mart/react';
+import { Portal } from 'react-portal';
 import GifPicker from 'gif-picker-react';
 
-import { faPaperclip } from '@fortawesome/free-solid-svg-icons';
+import { faPaperclip, faSmile } from '@fortawesome/free-solid-svg-icons';
 import { preventDefault } from '../utils';
 import { makeJpegIfNeeded } from '../utils/jpeg-if-needed';
 import { SubmitModeHint } from './submit-mode-hint';
@@ -16,9 +19,10 @@ import { Throbber } from './throbber';
 import { Icon } from './fontawesome-icons';
 import { ButtonLink } from './button-link';
 import { MoreWithTriangle } from './more-with-triangle';
+import styles from './overlay-popup.module.scss';
 import { SubmittableTextarea } from './mention-textarea';
 import { OverlayPopup } from './overlay-popup';
-import { tenor } from './tenor-api-key';
+import { tenorApiKey } from './tenor-api-key';
 
 const attachmentsMaxCount = CONFIG.attachments.maxCount;
 
@@ -30,6 +34,7 @@ const getDefaultState = (invitation = '') => ({
   attLoading: false,
   attachments: [],
   dropzoneDisabled: false,
+  emojiActive: false,
   gifActive: false,
 });
 
@@ -41,6 +46,10 @@ export default class CreatePost extends Component {
     this.state = getDefaultState(props.sendTo.invitation);
     this.textareaRef = createRef();
   }
+
+  setEmoji = (emoji) => {
+    this.setState({ postText: `${this.state.postText}${emoji}` });
+  };
 
   setGif = (gif) => {
     this.setState({ postText: `${this.state.postText} ${gif}` });
@@ -240,7 +249,6 @@ export default class CreatePost extends Component {
               {' | '}
               <span
                 className="post-edit-attachments"
-                //disabled={this.state.gifs}
                 role="button"
                 /* eslint-disable-next-line react/jsx-no-bind */
                 onClick={() => {
@@ -255,17 +263,51 @@ export default class CreatePost extends Component {
                     /* eslint-disable-next-line react/jsx-no-bind */
                     close={() => {
                       this.setState({ gifActive: false });
+                      this.textareaRef.current?.focus();
                     }}
                   >
                     <GifPicker
                       /* eslint-disable-next-line react/jsx-no-bind */
                       onGifClick={(gif) => this.setGif(gif.url)}
                       theme="auto"
-                      tenorApiKey={tenor[0].api_key}
+                      tenorApiKey={tenorApiKey}
                     />
                   </OverlayPopup>
                 </>
               )}
+              {' | '}
+              <span
+                className="post-edit-attachments"
+                role="button"
+                /* eslint-disable-next-line react/jsx-no-bind */
+                onClick={() => {
+                  this.setState({ emojiActive: !this.state.emojiActive });
+                }}
+              >
+                <Icon icon={faSmile} className="upload-icon" />
+              </span>
+              {this.state.emojiActive && (
+                <>
+                  <Portal>
+                    <div className={styles.popup}>
+                      <div className={styles.content}>
+                        <Picker
+                          autoFocus={true}
+                          /* eslint-disable-next-line react/jsx-no-bind */
+                          onClickOutside={() => {
+                            this.setState({ emojiActive: false });
+                            this.textareaRef.current?.focus();
+                          }}
+                          data={data}
+                          /* eslint-disable-next-line react/jsx-no-bind */
+                          onEmojiSelect={(emoji) => this.setEmoji(emoji.native)}
+                        />
+                      </div>
+                    </div>
+                  </Portal>
+                </>
+              )}
+
               <ButtonLink className="post-edit-more-trigger" onClick={this.toggleMore}>
                 <MoreWithTriangle />
               </ButtonLink>

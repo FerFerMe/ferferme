@@ -6,6 +6,7 @@ import {
   faGlobeAmericas,
   faUserFriends,
   faPaperclip,
+  faSmile,
   faBell,
   faUser,
 } from '@fortawesome/free-solid-svg-icons';
@@ -26,6 +27,7 @@ const preloadedIcons = [
   faUserFriends,
   faImage,
   faPaperclip,
+  faSmile,
   faBell,
   faUser,
 ];
