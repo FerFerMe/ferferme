@@ -6,6 +6,9 @@ import classnames from 'classnames';
 import _ from 'lodash';
 import dateFormat from 'date-fns/format';
 import * as Sentry from '@sentry/react';
+import data from '@emoji-mart/data';
+import Picker from '@emoji-mart/react';
+import { Portal } from 'react-portal';
 import GifPicker from 'gif-picker-react';
 import {
   faExclamationTriangle,
@@ -15,6 +18,7 @@ import {
   faAngleDoubleRight,
   faPaperclip,
   faShare,
+  faSmile,
 } from '@fortawesome/free-solid-svg-icons';
 
 import { pluralForm } from '../../utils';
@@ -43,6 +47,7 @@ import { SubmittableTextarea } from '../mention-textarea';
 import { OverlayPopup } from '../overlay-popup';
 import { tenorApiKey } from '../tenor-api-key';
 
+import styles from '../overlay-popup.module.scss';
 import { UnhideOptions, HideLink } from './post-hides-ui';
 import PostMoreLink from './post-more-link';
 import PostLikeLink from './post-like-link';
@@ -67,7 +72,12 @@ class Post extends Component {
     editingAttachments: [],
     dropzoneDisabled: false,
     unHideOpened: false,
+    emojiActive: false,
     gifActive: false,
+  };
+
+  setEmoji = (emoji) => {
+    this.setState({ editingText: `${this.state.editingText}${emoji}` });
   };
 
   setGif = (gif) => {
@@ -668,6 +678,17 @@ class Post extends Component {
                       >
                         GIF
                       </span>
+                      {' | '}
+                      <span
+                        className="post-edit-attachments"
+                        role="button"
+                        /* eslint-disable-next-line react/jsx-no-bind */
+                        onClick={() => {
+                          this.setState({ emojiActive: !this.state.emojiActive });
+                        }}
+                      >
+                        <Icon icon={faSmile} className="upload-icon" />
+                      </span>
                     </div>
                     {this.state.gifActive && (
                       <>
@@ -687,6 +708,29 @@ class Post extends Component {
                         </OverlayPopup>
                       </>
                     )}
+                         
+                    {this.state.emojiActive && (
+                      <>
+                        <Portal>
+                          <div className={styles.popup}>
+                            <div className={styles.content}>
+                              <Picker
+                                autoFocus={true}
+                                /* eslint-disable-next-line react/jsx-no-bind */
+                                onClickOutside={() => {
+                                  this.setState({ emojiActive: false });
+                                  this.textareaRef.current?.focus();
+                                }}
+                                data={data}
+                                /* eslint-disable-next-line react/jsx-no-bind */
+                                onEmojiSelect={(emoji) => this.setEmoji(emoji.native)}
+                              />
+                            </div>
+                          </div>
+                        </Portal>
+                      </>
+                    )}
+
                     <SubmitModeHint input={this.textareaRef} className="post-edit-hint" />
 
                     <div className="post-edit-buttons">
