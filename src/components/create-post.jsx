@@ -49,8 +49,8 @@ export default class CreatePost extends Component {
 
   setEmoji = (emoji) => {
     this.setState({ postText: `${this.state.postText}${emoji}` });
-    };
-    
+  };
+
   setGif = (gif) => {
     this.setState({ postText: `${this.state.postText} ${gif}` });
     this.setState({ gifActive: false });
@@ -305,7 +305,7 @@ export default class CreatePost extends Component {
                       </div>
                     </div>
                   </Portal>
-                    </>
+                </>
               )}
 
               <ButtonLink className="post-edit-more-trigger" onClick={this.toggleMore}>

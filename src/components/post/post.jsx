@@ -708,7 +708,6 @@ class Post extends Component {
                         </OverlayPopup>
                       </>
                     )}
-                         
                     {this.state.emojiActive && (
                       <>
                         <Portal>

@@ -38,7 +38,7 @@ export const CommentEditForm = forwardRef(function CommentEditForm(
   const [gifActive, setgifActive] = useState(false);
 
   const onChange = useCallback((e) => setText(e), []);
-  
+
   const canSubmit = useMemo(
     () => !submitStatus.loading && text.trim() !== '',
     [submitStatus.loading, text],
@@ -150,7 +150,6 @@ export const CommentEditForm = forwardRef(function CommentEditForm(
         >
           Comment
         </button>
-
         {!isPersistent && (
           <ButtonLink
             className="comment-cancel"
@@ -161,9 +160,7 @@ export const CommentEditForm = forwardRef(function CommentEditForm(
             Cancel
           </ButtonLink>
         )}
-
         <SubmitModeHint input={input} />
-
         <ButtonLink
           className="comment-file-button iconic-button"
           title="Add photo or file"
@@ -171,6 +168,36 @@ export const CommentEditForm = forwardRef(function CommentEditForm(
         >
           <Icon icon={faPaperclip} />
         </ButtonLink>
+        <span className="comment-file-button iconic-button">{' - '}</span>
+        <ButtonLink
+          className="comment-file-button iconic-button"
+          title="Add Gif"
+          /* eslint-disable-next-line react/jsx-no-bind */
+          onClick={() => {
+            setgifActive(!gifActive);
+          }}
+        >
+          GIF
+        </ButtonLink>
+        {gifActive && (
+          <>
+            <OverlayPopup
+              /* eslint-disable-next-line react/jsx-no-bind */
+              close={() => {
+                setgifActive(false);
+                input.current?.focus();
+              }}
+            >
+              <GifPicker
+                /* eslint-disable-next-line react/jsx-no-bind */
+                onGifClick={(gif) => setGif(gif.url)}
+                theme="auto"
+                tenorApiKey={tenorApiKey}
+              />
+            </OverlayPopup>
+          </>
+        )}
+        <span className="comment-file-button iconic-button">{' - '}</span>
         <ButtonLink
           className="comment-file-button iconic-button"
           title="Add Emoji"
@@ -200,37 +227,8 @@ export const CommentEditForm = forwardRef(function CommentEditForm(
                 </div>
               </div>
             </Portal>
-            </>
-            )}
-        <ButtonLink
-          className="comment-file-button iconic-button"
-          title="Add Gif"
-          /* eslint-disable-next-line react/jsx-no-bind */
-          onClick={() => {
-            setgifActive(!gifActive);
-          }}
-        >
-          GIF
-        </ButtonLink>
-        {gifActive && (
-          <>
-            <OverlayPopup
-              /* eslint-disable-next-line react/jsx-no-bind */
-              close={() => {
-                setgifActive(false);
-                input.current?.focus();
-              }}
-            >
-              <GifPicker
-                /* eslint-disable-next-line react/jsx-no-bind */
-                onGifClick={(gif) => setGif(gif.url)}
-                theme="auto"
-                tenorApiKey={tenorApiKey}
-              />
-            </OverlayPopup>
           </>
         )}
-
         {submitStatus.loading && <Throbber className="comment-throbber" />}
         {submitStatus.error && <span className="comment-error">{submitStatus.errorText}</span>}
       </div>
