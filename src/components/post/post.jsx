@@ -41,7 +41,7 @@ import { UserPicture } from '../user-picture';
 import { SubmitModeHint } from '../submit-mode-hint';
 import { SubmittableTextarea } from '../submittable-textarea';
 import { OverlayPopup } from '../overlay-popup';
-import { tenor } from '../tenor-api-key';
+import { tenorApiKey } from '../tenor-api-key';
 
 import { UnhideOptions, HideLink } from './post-hides-ui';
 import PostMoreLink from './post-more-link';
@@ -616,7 +616,6 @@ class Post extends Component {
                       {' | '}
                       <span
                         className="post-edit-attachments"
-                        //disabled={this.state.gifs}
                         role="button"
                         /* eslint-disable-next-line react/jsx-no-bind */
                         onClick={() => {
@@ -632,13 +631,14 @@ class Post extends Component {
                           /* eslint-disable-next-line react/jsx-no-bind */
                           close={() => {
                             this.setState({ gifActive: false });
+                            this.textareaRef.current?.focus();
                           }}
                         >
                           <GifPicker
                             /* eslint-disable-next-line react/jsx-no-bind */
                             onGifClick={(gif) => this.setGif(gif.url)}
                             theme="auto"
-                            tenorApiKey={tenor[0].api_key}
+                            tenorApiKey={tenorApiKey}
                           />
                         </OverlayPopup>
                       </>

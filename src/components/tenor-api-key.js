@@ -1,5 +1,1 @@
-export const tenor = [
-  {
-    api_key: 'YOUR_API_KEY',
-  },
-];
+export const tenorApiKey = 'YOUR_API_KEY';
