@@ -120,7 +120,6 @@ export const CommentEditForm = forwardRef(function CommentEditForm(
           maxLength={CONFIG.maxLength.comment}
           readOnly={submitStatus.loading}
           dir={'auto'}
-          id={'textArea'}
         />
       </div>
       <div>
