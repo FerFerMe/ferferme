@@ -15,7 +15,7 @@ import { Icon } from './fontawesome-icons';
 import { SubmitModeHint } from './submit-mode-hint';
 import { SubmittableTextarea } from './mention-textarea';
 import { OverlayPopup } from './overlay-popup';
-import { tenor } from './tenor-api-key';
+import { tenorApiKey } from './tenor-api-key';
 
 export const CommentEditForm = forwardRef(function CommentEditForm(
   {
@@ -162,7 +162,6 @@ export const CommentEditForm = forwardRef(function CommentEditForm(
         >
           <Icon icon={faPaperclip} />
         </ButtonLink>
-        <span className="comment-file-button iconic-button">{' - '}</span>
         <ButtonLink
           className="comment-file-button iconic-button"
           title="Add Gif"
@@ -179,13 +178,14 @@ export const CommentEditForm = forwardRef(function CommentEditForm(
               /* eslint-disable-next-line react/jsx-no-bind */
               close={() => {
                 setgifActive(false);
+                input.current?.focus();
               }}
             >
               <GifPicker
                 /* eslint-disable-next-line react/jsx-no-bind */
                 onGifClick={(gif) => setGif(gif.url)}
                 theme="auto"
-                tenorApiKey={tenor[0].api_key}
+                tenorApiKey={tenorApiKey}
               />
             </OverlayPopup>
           </>

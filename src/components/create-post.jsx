@@ -18,7 +18,7 @@ import { ButtonLink } from './button-link';
 import { MoreWithTriangle } from './more-with-triangle';
 import { SubmittableTextarea } from './mention-textarea';
 import { OverlayPopup } from './overlay-popup';
-import { tenor } from './tenor-api-key';
+import { tenorApiKey } from './tenor-api-key';
 
 const attachmentsMaxCount = CONFIG.attachments.maxCount;
 
@@ -240,11 +240,11 @@ export default class CreatePost extends Component {
               {' | '}
               <span
                 className="post-edit-attachments"
-                //disabled={this.state.gifs}
                 role="button"
                 /* eslint-disable-next-line react/jsx-no-bind */
                 onClick={() => {
                   this.setState({ gifActive: !this.state.gifActive });
+                  this.textareaRef.current?.focus();
                 }}
               >
                 GIF
@@ -261,7 +261,7 @@ export default class CreatePost extends Component {
                       /* eslint-disable-next-line react/jsx-no-bind */
                       onGifClick={(gif) => this.setGif(gif.url)}
                       theme="auto"
-                      tenorApiKey={tenor[0].api_key}
+                      tenorApiKey={tenorApiKey}
                     />
                   </OverlayPopup>
                 </>
