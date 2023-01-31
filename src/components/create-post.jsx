@@ -2,8 +2,11 @@
 import { Component, createRef } from 'react';
 import _ from 'lodash';
 import * as Sentry from '@sentry/react';
+import data from '@emoji-mart/data';
+import Picker from '@emoji-mart/react';
+import { Portal } from 'react-portal';
 
-import { faPaperclip } from '@fortawesome/free-solid-svg-icons';
+import { faPaperclip, faSmile } from '@fortawesome/free-solid-svg-icons';
 import { preventDefault } from '../utils';
 import { makeJpegIfNeeded } from '../utils/jpeg-if-needed';
 import { SubmitModeHint } from './submit-mode-hint';
@@ -16,6 +19,7 @@ import { Icon } from './fontawesome-icons';
 import { ButtonLink } from './button-link';
 import { MoreWithTriangle } from './more-with-triangle';
 import { SubmittableTextarea } from './submittable-textarea';
+import styles from './overlay-popup.module.scss';
 
 const attachmentsMaxCount = CONFIG.attachments.maxCount;
 
@@ -27,6 +31,7 @@ const getDefaultState = (invitation = '') => ({
   attLoading: false,
   attachments: [],
   dropzoneDisabled: false,
+  emojiActive: false,
 });
 
 export default class CreatePost extends Component {
@@ -37,6 +42,10 @@ export default class CreatePost extends Component {
     this.state = getDefaultState(props.sendTo.invitation);
     this.textareaRef = createRef();
   }
+
+  setEmoji = (emoji) => {
+    this.setState({ postText: `${this.state.postText}${emoji}` });
+  };
 
   createPost = () => {
     // Get all the values
@@ -228,7 +237,38 @@ export default class CreatePost extends Component {
               >
                 <Icon icon={faPaperclip} className="upload-icon" /> Add photos or files
               </span>
-
+              {' | '}
+              <span
+                className="post-edit-attachments"
+                role="button"
+                /* eslint-disable-next-line react/jsx-no-bind */
+                onClick={() => {
+                  this.setState({ emojiActive: !this.state.emojiActive });
+                }}
+              >
+                <Icon icon={faSmile} className="upload-icon" />
+              </span>
+              {this.state.emojiActive && (
+                <>
+                  <Portal>
+                    <div className={styles.popup}>
+                      <div className={styles.content}>
+                        <Picker
+                          autoFocus={true}
+                          /* eslint-disable-next-line react/jsx-no-bind */
+                          onClickOutside={() => {
+                            this.setState({ emojiActive: false });
+                            this.textareaRef.current?.focus();
+                          }}
+                          data={data}
+                          /* eslint-disable-next-line react/jsx-no-bind */
+                          onEmojiSelect={(emoji) => this.setEmoji(emoji.native)}
+                        />
+                      </div>
+                    </div>
+                  </Portal>
+                </>
+              )}
               <ButtonLink className="post-edit-more-trigger" onClick={this.toggleMore}>
                 <MoreWithTriangle />
               </ButtonLink>

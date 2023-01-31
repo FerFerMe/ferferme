@@ -6,6 +6,7 @@ import {
   faGlobeAmericas,
   faUserFriends,
   faPaperclip,
+  faSmile,
 } from '@fortawesome/free-solid-svg-icons';
 import { faComment, faHeart as faHeartO, faImage } from '@fortawesome/free-regular-svg-icons';
 import { faCommentPlus } from './fontawesome-custom-icons';
@@ -24,6 +25,7 @@ const preloadedIcons = [
   faUserFriends,
   faImage,
   faPaperclip,
+  faSmile,
 ];
 
 export const SVGSymbolDeclarations = memo(function SVGSymbolDeclarations() {
