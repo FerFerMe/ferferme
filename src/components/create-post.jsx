@@ -49,11 +49,13 @@ export default class CreatePost extends Component {
   }
 
   setEmoji = (emoji) => {
-    this.setState({ postText: `${this.state.postText}${emoji}` });
+    this.textareaRef.current.focus();
+    this.onPostTextChange(this.state.postText + emoji);
   };
 
   setGif = (gif) => {
-    this.setState({ postText: `${this.state.postText} ${gif}` });
+    this.textareaRef.current.focus();
+    this.onPostTextChange(`${this.state.postText} ${gif}`);
     this.setState({ gifActive: false });
   };
 
@@ -264,7 +266,6 @@ export default class CreatePost extends Component {
                     /* eslint-disable-next-line react/jsx-no-bind */
                     close={() => {
                       this.setState({ gifActive: false });
-                      this.textareaRef.current?.focus();
                     }}
                   >
                     <GifPicker
