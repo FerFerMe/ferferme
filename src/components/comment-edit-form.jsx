@@ -12,6 +12,8 @@ import { PreventPageLeaving } from './prevent-page-leaving';
 import { ButtonLink } from './button-link';
 import { useUploader, useFileChooser } from './hooks/uploads';
 import { Icon } from './fontawesome-icons';
+import { faGif } from './fontawesome-custom-icons';
+
 import { SubmitModeHint } from './submit-mode-hint';
 import { SubmittableTextarea } from './submittable-textarea';
 import { OverlayPopup } from './overlay-popup';
@@ -168,7 +170,7 @@ export const CommentEditForm = forwardRef(function CommentEditForm(
             setgifActive(!gifActive);
           }}
         >
-          GIF
+          <Icon icon={faGif} />
         </ButtonLink>
         {gifActive && (
           <>

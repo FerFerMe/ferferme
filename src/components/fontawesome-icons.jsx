@@ -8,7 +8,7 @@ import {
   faPaperclip,
 } from '@fortawesome/free-solid-svg-icons';
 import { faComment, faHeart as faHeartO, faImage } from '@fortawesome/free-regular-svg-icons';
-import { faCommentPlus } from './fontawesome-custom-icons';
+import { faCommentPlus, faGif } from './fontawesome-custom-icons';
 
 // These icons will be embedded to the page just once
 // (in <SVGSymbolDeclarations> element) and will be linked
@@ -24,6 +24,7 @@ const preloadedIcons = [
   faUserFriends,
   faImage,
   faPaperclip,
+  faGif,
 ];
 
 export const SVGSymbolDeclarations = memo(function SVGSymbolDeclarations() {

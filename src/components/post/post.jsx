@@ -42,6 +42,7 @@ import { SubmitModeHint } from '../submit-mode-hint';
 import { SubmittableTextarea } from '../submittable-textarea';
 import { OverlayPopup } from '../overlay-popup';
 import { tenorApiKey } from '../tenor-api-key';
+import { faGif } from '../fontawesome-custom-icons';
 
 import { UnhideOptions, HideLink } from './post-hides-ui';
 import PostMoreLink from './post-more-link';
@@ -622,7 +623,7 @@ class Post extends Component {
                           this.setState({ gifActive: !this.state.gifActive });
                         }}
                       >
-                        GIF
+                        <Icon icon={faGif} className="upload-icon" /> Add Gif
                       </span>
                     </div>
                     {this.state.gifActive && (
