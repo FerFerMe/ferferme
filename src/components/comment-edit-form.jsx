@@ -15,6 +15,8 @@ import { PreventPageLeaving } from './prevent-page-leaving';
 import { ButtonLink } from './button-link';
 import { useUploader, useFileChooser } from './hooks/uploads';
 import { Icon } from './fontawesome-icons';
+import { faGif } from './fontawesome-custom-icons';
+
 import { SubmitModeHint } from './submit-mode-hint';
 import styles from './overlay-popup.module.scss';
 import { SubmittableTextarea } from './mention-textarea';
@@ -168,7 +170,6 @@ export const CommentEditForm = forwardRef(function CommentEditForm(
         >
           <Icon icon={faPaperclip} />
         </ButtonLink>
-        <span className="comment-file-button iconic-button">{' - '}</span>
         <ButtonLink
           className="comment-file-button iconic-button"
           title="Add Gif"
@@ -177,7 +178,7 @@ export const CommentEditForm = forwardRef(function CommentEditForm(
             setgifActive(!gifActive);
           }}
         >
-          GIF
+          <Icon icon={faGif} />
         </ButtonLink>
         {gifActive && (
           <>
@@ -197,7 +198,6 @@ export const CommentEditForm = forwardRef(function CommentEditForm(
             </OverlayPopup>
           </>
         )}
-        <span className="comment-file-button iconic-button">{' - '}</span>
         <ButtonLink
           className="comment-file-button iconic-button"
           title="Add Emoji"

@@ -43,6 +43,7 @@ import { destinationsPrivacy } from '../select-utils';
 import { Icon } from '../fontawesome-icons';
 import { UserPicture } from '../user-picture';
 import { SubmitModeHint } from '../submit-mode-hint';
+import { faGif } from '../fontawesome-custom-icons';
 import { SubmittableTextarea } from '../mention-textarea';
 import { OverlayPopup } from '../overlay-popup';
 import { tenorApiKey } from '../tenor-api-key';
@@ -676,7 +677,7 @@ class Post extends Component {
                           this.setState({ gifActive: !this.state.gifActive });
                         }}
                       >
-                        GIF
+                        <Icon icon={faGif} className="upload-icon" /> Add Gif
                       </span>
                       {' | '}
                       <span

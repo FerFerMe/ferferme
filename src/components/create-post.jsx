@@ -10,6 +10,7 @@ import GifPicker from 'gif-picker-react';
 import { faPaperclip, faSmile } from '@fortawesome/free-solid-svg-icons';
 import { preventDefault } from '../utils';
 import { makeJpegIfNeeded } from '../utils/jpeg-if-needed';
+import { faGif } from './fontawesome-custom-icons';
 import { SubmitModeHint } from './submit-mode-hint';
 import SendTo from './send-to';
 import Dropzone from './dropzone';
@@ -255,7 +256,7 @@ export default class CreatePost extends Component {
                   this.setState({ gifActive: !this.state.gifActive });
                 }}
               >
-                GIF
+                <Icon icon={faGif} className="upload-icon" /> Add Gif
               </span>
               {this.state.gifActive && (
                 <>
