@@ -126,6 +126,29 @@ class PostComment extends Component {
     leave: () => this.props.arrowsHighlightHandlers.leave(),
   };
 
+  doTranslate = () => {
+    const xhttp = new XMLHttpRequest();
+    xhttp.open(
+      'GET',
+      `https://script.google.com/macros/s/AKfycbyTMpl4oDrxRoCMSKl2-3HSyQZojjvJxJ2QGlO3M21ybqTzpLwXWlaO5BdznBVZcyTfZA/exec?text=${this.props.body}`,
+      false,
+    );
+    xhttp.send();
+    document.querySelector(
+      `#b-${this.props.id}`,
+    ).innerHTML = `<span class="Linkify" dir="auto" role="region">${xhttp.responseText}</span>`;
+    document.querySelector(`#tr-${this.props.id}`).style.display = 'none';
+    document.querySelector(`#u-tr-${this.props.id}`).style.display = 'inline';
+  };
+
+  undoTranslate = () => {
+    document.querySelector(
+      `#b-${this.props.id}`,
+    ).innerHTML = `<span class="Linkify" dir="auto" role="region">${this.props.body}</span>`;
+    document.querySelector(`#tr-${this.props.id}`).style.display = 'inline';
+    document.querySelector(`#u-tr-${this.props.id}`).style.display = 'none';
+  };
+
   like = () => this.props.likeComment(this.props.id);
   unlike = () => this.props.unlikeComment(this.props.id);
 
@@ -221,6 +244,16 @@ class PostComment extends Component {
                   </ButtonLink>
                 </span>
               )}
+              <span className="comment-tail__action" id={`tr-${this.props.id}`}>
+                <ButtonLink onClick={this.doTranslate}>Translate</ButtonLink>
+              </span>
+              <span
+                style={{ display: 'none' }}
+                className="comment-tail__action"
+                id={`u-tr-${this.props.id}`}
+              >
+                <ButtonLink onClick={this.undoTranslate}>Original</ButtonLink>
+              </span>
               <span className="comment-tail__action">
                 <PostCommentMore
                   className="comment-tail__action-link comment-tail__action-link--more"
@@ -299,15 +332,17 @@ class PostComment extends Component {
           bonusInfo={commentTail}
           config={commentReadmoreConfig}
         >
-          <PieceOfText
-            text={this.props.body}
-            readMoreStyle={this.props.readMoreStyle}
-            highlightTerms={this.props.highlightTerms}
-            userHover={this.props.authorHighlightHandlers}
-            arrowHover={this.arrowHoverHandlers}
-            arrowClick={this.arrowClick}
-            showMedia={this.props.showMedia}
-          />
+          <span id={`b-${this.props.id}`}>
+            <PieceOfText
+              text={this.props.body}
+              readMoreStyle={this.props.readMoreStyle}
+              highlightTerms={this.props.highlightTerms}
+              userHover={this.props.authorHighlightHandlers}
+              arrowHover={this.arrowHoverHandlers}
+              arrowClick={this.arrowClick}
+              showMedia={this.props.showMedia}
+            />
+          </span>
           {commentTail}
         </Expandable>
       </div>
