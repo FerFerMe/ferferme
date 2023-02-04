@@ -10,7 +10,7 @@ import TimeDisplay from './time-display';
 import UserName from './user-name';
 import { Icon } from './fontawesome-icons';
 
-export const UserProfileHeadStats = ({ user, canFollowStatLinks }) => {
+export const UserProfileHeadStats = ({ user, canFollowStatLinks, canCheckMeetLinks }) => {
   const invitedBy = useSelector((state) => state.invitedByMap[user.username]);
 
   if (!user.statistics) {
@@ -69,6 +69,7 @@ export const UserProfileHeadStats = ({ user, canFollowStatLinks }) => {
             title="  Group Call"
             href={`https://meet.freefeed.me/${username}`}
             canFollow={canFollowStatLinks}
+            canCheckMeet={canCheckMeetLinks}
           />
         </ul>
       </div>
@@ -153,11 +154,11 @@ function StatLink({ value, title, linkTo, canFollow, className }) {
   return <li className={cn(styles.statlink, className)}>{content}</li>;
 }
 
-function IconLink({ icon, title, href, canFollow, className }) {
+function IconLink({ icon, title, href, canFollow, canCheckMeet, className }) {
   let content;
   content = ` ${title}`;
 
-  if (canFollow) {
+  if (canFollow && canCheckMeet) {
     content = (
       <a className={styles.searchButton} href={href}>
         <Icon icon={icon} className={styles.caret} />
