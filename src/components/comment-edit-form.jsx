@@ -18,12 +18,11 @@ import { Icon } from './fontawesome-icons';
 import { faGif } from './fontawesome-custom-icons';
 
 import { SubmitModeHint } from './submit-mode-hint';
-import { SubmittableTextarea } from './submittable-textarea';
-import styles from './overlay-popup.module.scss';
 import { SubmittableTextarea } from './mention-textarea';
 import { OverlayPopup } from './overlay-popup';
 import { tenorApiKey } from './tenor-api-key';
 import { PostContext } from './post/post-context';
+import styles from './overlay-popup.module.scss';
 
 export const CommentEditForm = forwardRef(function CommentEditForm(
   {
