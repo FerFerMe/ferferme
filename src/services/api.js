@@ -787,3 +787,7 @@ export function disableBansInGroup({ groupName }) {
 export function enableBansInGroup({ groupName }) {
   return fetch(`${apiRoot}/v2/groups/${groupName}/enableBans`, postRequestOptions());
 }
+
+export function getSingleComment({ commentId }) {
+  return fetch(`${apiRoot}/v1/comments/${commentId}`, getRequestOptions());
+}

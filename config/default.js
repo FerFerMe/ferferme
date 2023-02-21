@@ -6,53 +6,84 @@ const DAY_IN_MILLISECONDS = 1000 * 60 * 60 * 24;
 
 export default {
   api: {
-    root: 'https://candy.freefeed.net',
+    root: 'https://freefeed.net',
   },
 
   siteTitle: 'FreeFeed',
-
-  siteOrigin: 'http://localhost:3333',
-
+  siteOrigin: 'https://freefeed.net',
   auth: {
     tokenPrefix: 'freefeed_',
-    userStorageKey: 'USER_KEY',
+    userStorageKey: 'whoamiCache',
   },
-
+  sentry: {
+    publicDSN: 'https://abdac1f2db2d45efaa9142062fe14bd8@sentry.io/75960',
+  },
   captcha: {
-    siteKey: '',
+    siteKey: '6LdChhITAAAAAGzgvUPPCbg0cxJzcxFc5vlBs9u5',
   },
 
   search: {
     searchEngine: null,
   },
-
+  analytics: {
+    google: 'UA-240175117-2',
+  },
+  newUsersProtected: true,
+  registrationsLimit: {
+    emailFormIframeSrc: null,
+  },
+  registrationsByInvite: {
+    formIframeSrc:
+        'https://docs.google.com/forms/d/e/1FAIpQLSdBzsUIHzR57Ylt2AfUfbIf9Bc03I8Oq2SdQmYqp0s-OsWmnw/viewform',
+  },
+  betaChannel: {
+    // Set to true to enable 'Use the beta version' switcher in settings
+    enabled: false,
+    // Is the current instance is a beta instance?
+    isBeta: false,
+    subHeading: 'Beta',
+    cookieName: 'beta_channel',
+    cookieValue: '1',
+  },
   siteDomains: [
     // for transform links in the posts, comments, etc.
     'freefeed.net',
     'gamma.freefeed.net',
+    'freefeed.me',
   ],
 
   attachments: { maxCount: 20 },
-
-  textFormatter: {
-    tldList: TLDs,
-    /**
-     * The format is:
-     * [
-     *  { title: "Telegram", linkTpl: "https://t.me/{}", shortCodes: ["tg", "telegram"] },
-     *  { title: "Twitter", linkTpl: "https://twitter.com/{}", shortCodes: ["tw", "twitter"] },
-     *  ...
-     * ]
-     */
-    foreignMentionServices: [],
+  maxLength: {
+    post: 3000,
+    comment: 3000,
+    description: 1500,
   },
 
-  sentry: {
-    publicDSN: null,
+  minPasswordLength: 9,
+  textFormatter: {
+    tldList: TLDs,
+    foreignMentionServices: [
+      { title: 'Facebook', linkTpl: 'https://www.facebook.com/{}', shortCodes: ['fb', 'facebook'] },
+      { title: 'FreeFeed', linkTpl: 'https://freefeed.net/{}', shortCodes: ['freefeed'] },
+      { title: 'GitHub', linkTpl: 'https://github.com/{}', shortCodes: ['github'] },
+      {
+        title: 'Instagram',
+        linkTpl: 'https://www.instagram.com/{}/',
+        shortCodes: ['ig', 'instagram'],
+      },
+      {
+        title: 'LiveJournal',
+        linkTpl: 'https://users.livejournal.com/{}/',
+        shortCodes: ['lj', 'livejournal'],
+      },
+      { title: 'Mokum', linkTpl: 'https://mokum.place/{}', shortCodes: ['mokum'] },
+      { title: 'Telegram', linkTpl: 'https://t.me/{}', shortCodes: ['tg', 'telegram'] },
+      { title: 'Twitter', linkTpl: 'https://twitter.com/{}', shortCodes: ['twitter'] },
+    ],
   },
 
   frontendPreferences: {
-    clientId: 'net.freefeed',
+    clientId: 'me.freefeed',
     // Use only plain JSON types here. Do not use null values (for type checking).
     defaultValues: {
       displayNames: {
@@ -70,7 +101,7 @@ export default {
       readMoreStyle: 'modern',
       homeFeedSort: ACTIVITY,
       homeFeedMode: HOMEFEED_MODE_CLASSIC,
-      homefeed: { hideUsers: [], hideTags: [] },
+      homefeed: { hideUsers: [], hideTags: []  },
       hidesInNonHomeFeeds: false,
       pinnedGroups: [],
       hideUnreadNotifications: false,
@@ -112,30 +143,7 @@ export default {
     minFolded: 3,
   },
 
-  // if false, new users are public by default
-  newUsersProtected: false,
-
-  registrationsLimit: {
-    emailFormIframeSrc: null,
-  },
-
-  registrationsByInvite: {
-    formIframeSrc: null,
-  },
-
-  analytics: {
-    google: null,
-  },
-
-  betaChannel: {
-    // Set to true to enable 'Use the beta version' switcher in settings
-    enabled: false,
-    // Is the current instance is a beta instance?
-    isBeta: false,
-    subHeading: 'Beta',
-    cookieName: 'beta_channel',
-    cookieValue: '1',
-  },
+  // if false, new users are public by default *
 
   eslint: {
     // By default the eslint-linebreak-style directive requires "windows" linebreaks
@@ -144,14 +152,6 @@ export default {
     // to "windows" or "unix".
     linebreakStyle: null,
   },
-
-  maxLength: {
-    post: 3000,
-    comment: 3000,
-    description: 1500,
-  },
-
-  minPasswordLength: 9,
 
   appVersionCheck: {
     // Use real URL/URI here to enable update check
@@ -179,8 +179,6 @@ export default {
       liberaPayProject: null,
       // yasobe.ru project name
       yasobeRuProject: null,
-      // boosty project name
-      boostyProject: null,
     },
   },
 };

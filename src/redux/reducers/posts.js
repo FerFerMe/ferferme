@@ -32,6 +32,7 @@ import {
   UNHIDE_POST,
   UNLIKE_POST,
   UNLIKE_POST_OPTIMISTIC,
+  GET_SINGLE_POST_BODY,
 } from '../action-types';
 import { asyncStatesMap, fail, getKeyBy, response } from '../async-helpers';
 import { mergeByIds, patchObjectByKey } from './helpers';
@@ -402,6 +403,9 @@ export function posts(state = {}, action) {
       return updatePostData(state, action);
     }
     case response(GET_SINGLE_POST): {
+      return updatePostData(state, action);
+    }
+    case response(GET_SINGLE_POST_BODY): {
       return updatePostData(state, action);
     }
     case REALTIME_POST_NEW: {
