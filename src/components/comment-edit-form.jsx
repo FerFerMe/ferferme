@@ -1,5 +1,5 @@
 /* global CONFIG */
-import { useMemo, useCallback, useState, useRef, useEffect, forwardRef } from 'react';
+import { useMemo, useCallback, useState, useRef, useEffect, forwardRef, useContext } from 'react';
 import cn from 'classnames';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
@@ -18,22 +18,27 @@ import { Icon } from './fontawesome-icons';
 import { faGif } from './fontawesome-custom-icons';
 
 import { SubmitModeHint } from './submit-mode-hint';
+import { SubmittableTextarea } from './submittable-textarea';
 import styles from './overlay-popup.module.scss';
 import { SubmittableTextarea } from './mention-textarea';
 import { OverlayPopup } from './overlay-popup';
 import { tenorApiKey } from './tenor-api-key';
+import { PostContext } from './post/post-context';
 
 export const CommentEditForm = forwardRef(function CommentEditForm(
   {
     initialText = '',
     // Persistent form is always on page so we don't need to show Cancel button
     isPersistent = false,
+    // Adding new comment form
+    isAddingComment = false,
     onSubmit = () => {},
     onCancel = () => {},
     submitStatus = initialAsyncState,
   },
   fwdRef,
 ) {
+  const { setInput } = useContext(PostContext);
   const input = useRef(null);
   const [text, setText] = useState(initialText);
   const [emojiActive, setemojiActive] = useState(false);
@@ -74,6 +79,13 @@ export const CommentEditForm = forwardRef(function CommentEditForm(
       input.current.blur();
     }
   }, [isPersistent, submitStatus.initial]);
+
+  // Set input context if persistent form
+  useEffect(() => {
+    if (isAddingComment) {
+      setInput(input.current);
+    }
+  }, [setInput, isAddingComment]);
 
   const insText = (insertion) => {
     const [text, selStart, selEnd] = insertText(

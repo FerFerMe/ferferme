@@ -38,8 +38,8 @@ export const UserProfileHeadStats = ({ user, canFollowStatLinks, canCheckMeetLin
           {invitedBy && (
             <li className={styles.statlink}>
               <span className={styles.statlinkText}>
-                <span className={styles.invitedBy}>Invited by</span> @
-                <UserName user={{ username: invitedBy }} />
+                <span className={styles.invitedBy}>Invited by</span>{' '}
+                <UserName user={{ username: invitedBy }}>@{invitedBy}</UserName>
               </span>
             </li>
           )}
@@ -118,8 +118,8 @@ export const UserProfileHeadStats = ({ user, canFollowStatLinks, canCheckMeetLin
         {invitedBy && (
           <li className={styles.statlink}>
             <span className={styles.statlinkText}>
-              <span className={styles.invitedBy}>Invited by</span> @
-              <UserName user={{ username: invitedBy }} />
+              <span className={styles.invitedBy}>Invited by</span>{' '}
+              <UserName user={{ username: invitedBy }}>@{invitedBy}</UserName>
             </span>
           </li>
         )}

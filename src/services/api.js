@@ -780,6 +780,14 @@ export function sendVerificationCode({ email, mode }) {
   return fetch(`${apiRoot}/v2/users/verifyEmail`, postRequestOptions('POST', { email, mode }));
 }
 
+export function disableBansInGroup({ groupName }) {
+  return fetch(`${apiRoot}/v2/groups/${groupName}/disableBans`, postRequestOptions());
+}
+
+export function enableBansInGroup({ groupName }) {
+  return fetch(`${apiRoot}/v2/groups/${groupName}/enableBans`, postRequestOptions());
+}
+
 export function getSingleComment({ commentId }) {
   return fetch(`${apiRoot}/v1/comments/${commentId}`, getRequestOptions());
 }

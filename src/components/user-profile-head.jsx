@@ -28,6 +28,8 @@ import {
   revokeSentRequest,
   sendSubscriptionRequest,
   subscribe,
+  disableBansInGroup,
+  enableBansInGroup,
 } from '../redux/action-creators';
 import { USERNAME } from '../utils/hide-criteria';
 import { withKey } from './with-key';
@@ -174,6 +176,16 @@ export const UserProfileHead = withRouter(
         (state) => state.userActionsStatuses.blocking[user?.username] || initialAsyncState,
       ),
     };
+    const toggleShowBans = {
+      onClick: useCallback(() => {
+        const bansDisabled = user.youCan.includes('undisable_bans');
+        const updateBans = bansDisabled ? enableBansInGroup : disableBansInGroup;
+        dispatch(updateBans(user.username));
+      }, [dispatch, user]),
+      status: useSelector(
+        (state) => state.userActionsStatuses.blocking[user?.username] || initialAsyncState,
+      ),
+    };
     const unsubFromMe = {
       onClick: useCallback(
         () =>
@@ -193,6 +205,7 @@ export const UserProfileHead = withRouter(
       togglePinned,
       toggleHidden,
       toggleBanned,
+      toggleShowBans,
       unsubFromMe,
     ]
       .map((a) => a.status.errorText)
@@ -298,6 +311,7 @@ export const UserProfileHead = withRouter(
               togglePinned={togglePinned}
               isPinned={isPinned}
               toggleHidden={toggleHidden}
+              toggleShowBans={toggleShowBans}
               isHidden={isHidden}
             />
             <div className={styles.errorsList}>
