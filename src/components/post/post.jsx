@@ -6,6 +6,7 @@ import classnames from 'classnames';
 import _ from 'lodash';
 import dateFormat from 'date-fns/format';
 import * as Sentry from '@sentry/react';
+import GifPicker from 'gif-picker-react';
 import {
   faExclamationTriangle,
   faLock,
@@ -38,7 +39,9 @@ import { destinationsPrivacy } from '../select-utils';
 import { Icon } from '../fontawesome-icons';
 import { UserPicture } from '../user-picture';
 import { SubmitModeHint } from '../submit-mode-hint';
-import { SubmittableTextarea } from '../submittable-textarea';
+import { SubmittableTextarea } from '../mention-textarea';
+import { OverlayPopup } from '../overlay-popup';
+import { tenor } from '../tenor-api-key';
 
 import { prepareAsyncFocus } from '../../utils/prepare-async-focus';
 import { UnhideOptions, HideLink } from './post-hides-ui';
@@ -66,6 +69,12 @@ class Post extends Component {
     editingAttachments: [],
     dropzoneDisabled: false,
     unHideOpened: false,
+    gifActive: false,
+  };
+
+  setGif = (gif) => {
+    this.setState({ editingText: `${this.state.editingText} ${gif}` });
+    this.setState({ gifActive: false });
   };
 
   handleDropzoneInit = (d) => {
@@ -178,8 +187,31 @@ class Post extends Component {
     this.props.enableComments(this.props.id);
   };
 
+  doTranslate = () => {
+    const xhttp = new XMLHttpRequest();
+    xhttp.open(
+      'GET',
+      `https://script.google.com/macros/s/AKfycbyTMpl4oDrxRoCMSKl2-3HSyQZojjvJxJ2QGlO3M21ybqTzpLwXWlaO5BdznBVZcyTfZA/exec?text=${this.props.body}`,
+      false,
+    );
+    xhttp.send();
+    document.querySelector(
+      `#b-${this.props.id}`,
+    ).innerHTML = `<span class="Linkify" dir="auto" role="region">${xhttp.responseText}</span>`;
+    document.querySelector(`#tr-${this.props.id}`).style.display = 'none';
+    document.querySelector(`#u-tr-${this.props.id}`).style.display = 'inline';
+  };
+
+  undoTranslate = () => {
+    document.querySelector(
+      `#b-${this.props.id}`,
+    ).innerHTML = `<span class="Linkify" dir="auto" role="region">${this.props.body}</span>`;
+    document.querySelector(`#tr-${this.props.id}`).style.display = 'inline';
+    document.querySelector(`#u-tr-${this.props.id}`).style.display = 'none';
+  };
+
   handlePostTextChange = (e) => {
-    this.setState({ editingText: e.target.value });
+    this.setState({ editingText: e });
   };
 
   toggleEditingPost = () => {
@@ -406,6 +438,17 @@ class Post extends Component {
         false
       );
 
+    const translate = (
+      <ButtonLink className="post-action" onClick={this.doTranslate}>
+        Translate
+      </ButtonLink>
+    );
+
+    const untranslate = (
+      <ButtonLink className="post-action" onClick={this.undoTranslate}>
+        Original
+      </ButtonLink>
+    );
     // "More" menu
     const moreLink = (
       <PostMoreLink
@@ -485,6 +528,16 @@ class Post extends Component {
                   {this.renderHideLink()}
                 </span>
               )}
+              <span className="post-footer-item" id={`tr-${this.props.id}`}>
+                {translate}
+              </span>
+              <span
+                style={{ display: 'none' }}
+                className="post-footer-item"
+                id={`u-tr-${this.props.id}`}
+              >
+                {untranslate}
+              </span>
               <span className="post-footer-item">{moreLink}</span>
             </span>
           </div>
@@ -608,8 +661,36 @@ class Post extends Component {
                       >
                         <Icon icon={faPaperclip} className="upload-icon" /> Add photos or files
                       </span>
+                      {' | '}
+                      <span
+                        className="post-edit-attachments"
+                        //disabled={this.state.gifs}
+                        role="button"
+                        /* eslint-disable-next-line react/jsx-no-bind */
+                        onClick={() => {
+                          this.setState({ gifActive: !this.state.gifActive });
+                        }}
+                      >
+                        GIF
+                      </span>
                     </div>
-
+                    {this.state.gifActive && (
+                      <>
+                        <OverlayPopup
+                          /* eslint-disable-next-line react/jsx-no-bind */
+                          close={() => {
+                            this.setState({ gifActive: false });
+                          }}
+                        >
+                          <GifPicker
+                            /* eslint-disable-next-line react/jsx-no-bind */
+                            onGifClick={(gif) => this.setGif(gif.url)}
+                            theme="auto"
+                            tenorApiKey={tenor[0].api_key}
+                          />
+                        </OverlayPopup>
+                      </>
+                    )}
                     <SubmitModeHint input={this.textareaRef} className="post-edit-hint" />
 
                     <div className="post-edit-buttons">
@@ -644,12 +725,14 @@ class Post extends Component {
                 </div>
               ) : (
                 <div className="post-text">
-                  <PieceOfText
-                    text={props.body}
-                    readMoreStyle={props.readMoreStyle}
-                    highlightTerms={props.highlightTerms}
-                    showMedia={this.props.showMedia}
-                  />
+                  <span id={`b-${this.props.id}`}>
+                    <PieceOfText
+                      text={props.body}
+                      readMoreStyle={props.readMoreStyle}
+                      highlightTerms={props.highlightTerms}
+                      showMedia={this.props.showMedia}
+                    />
+                  </span>
                 </div>
               )}
             </div>

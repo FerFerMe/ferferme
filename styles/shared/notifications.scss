@@ -34,4 +34,15 @@
     display: flex;
     flex-direction: column;
   }
+
+  notification-body {
+    font-size: rem(14px);
+    margin-top: rem(10px);
+    position: relative;
+    word-wrap: break-word;
+  }
+
+  .notification-time-date {
+    margin-top: 12px;
+  }
 }

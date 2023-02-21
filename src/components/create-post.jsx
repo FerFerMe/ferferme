@@ -2,6 +2,7 @@
 import { Component, createRef } from 'react';
 import _ from 'lodash';
 import * as Sentry from '@sentry/react';
+import GifPicker from 'gif-picker-react';
 
 import { faPaperclip } from '@fortawesome/free-solid-svg-icons';
 import { preventDefault } from '../utils';
@@ -15,7 +16,9 @@ import { Throbber } from './throbber';
 import { Icon } from './fontawesome-icons';
 import { ButtonLink } from './button-link';
 import { MoreWithTriangle } from './more-with-triangle';
-import { SubmittableTextarea } from './submittable-textarea';
+import { SubmittableTextarea } from './mention-textarea';
+import { OverlayPopup } from './overlay-popup';
+import { tenor } from './tenor-api-key';
 
 const attachmentsMaxCount = CONFIG.attachments.maxCount;
 
@@ -27,6 +30,7 @@ const getDefaultState = (invitation = '') => ({
   attLoading: false,
   attachments: [],
   dropzoneDisabled: false,
+  gifActive: false,
 });
 
 export default class CreatePost extends Component {
@@ -37,6 +41,11 @@ export default class CreatePost extends Component {
     this.state = getDefaultState(props.sendTo.invitation);
     this.textareaRef = createRef();
   }
+
+  setGif = (gif) => {
+    this.setState({ postText: `${this.state.postText} ${gif}` });
+    this.setState({ gifActive: false });
+  };
 
   createPost = () => {
     // Get all the values
@@ -128,7 +137,7 @@ export default class CreatePost extends Component {
   };
 
   onPostTextChange = (e) => {
-    this.setState({ postText: e.target.value }, this.checkCreatePostAvailability);
+    this.setState({ postText: e }, this.checkCreatePostAvailability);
   };
 
   attLoadingStarted = () => this.setState({ attLoading: true });
@@ -228,7 +237,35 @@ export default class CreatePost extends Component {
               >
                 <Icon icon={faPaperclip} className="upload-icon" /> Add photos or files
               </span>
-
+              {' | '}
+              <span
+                className="post-edit-attachments"
+                //disabled={this.state.gifs}
+                role="button"
+                /* eslint-disable-next-line react/jsx-no-bind */
+                onClick={() => {
+                  this.setState({ gifActive: !this.state.gifActive });
+                }}
+              >
+                GIF
+              </span>
+              {this.state.gifActive && (
+                <>
+                  <OverlayPopup
+                    /* eslint-disable-next-line react/jsx-no-bind */
+                    close={() => {
+                      this.setState({ gifActive: false });
+                    }}
+                  >
+                    <GifPicker
+                      /* eslint-disable-next-line react/jsx-no-bind */
+                      onGifClick={(gif) => this.setGif(gif.url)}
+                      theme="auto"
+                      tenorApiKey={tenor[0].api_key}
+                    />
+                  </OverlayPopup>
+                </>
+              )}
               <ButtonLink className="post-edit-more-trigger" onClick={this.toggleMore}>
                 <MoreWithTriangle />
               </ButtonLink>
