@@ -48,6 +48,7 @@ import { SubmittableTextarea } from '../mention-textarea';
 import { OverlayPopup } from '../overlay-popup';
 import { tenorApiKey } from '../tenor-api-key';
 
+import { prepareAsyncFocus } from '../../utils/prepare-async-focus';
 import styles from '../overlay-popup.module.scss';
 import { UnhideOptions, HideLink } from './post-hides-ui';
 import PostMoreLink from './post-more-link';
@@ -56,6 +57,7 @@ import PostHeader from './post-header';
 import PostAttachments from './post-attachments';
 import PostComments from './post-comments';
 import PostLikes from './post-likes';
+import { PostContext } from './post-context';
 
 const attachmentsMaxCount = CONFIG.attachments.maxCount;
 
@@ -138,11 +140,13 @@ class Post extends Component {
   attLoadingCompleted = () => this.setState({ attLoading: false });
 
   handleCommentClick = () => {
-    if (this.props.isSinglePost) {
-      return;
+    if (this.props.isCommenting) {
+      this.context.input?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      this.context.input?.focus();
+    } else {
+      prepareAsyncFocus();
+      this.props.toggleCommenting(this.props.id);
     }
-
-    this.props.toggleCommenting(this.props.id);
   };
 
   handleDeletePost =
@@ -850,6 +854,8 @@ class Post extends Component {
     );
   }
 }
+
+Post.contextType = PostContext;
 
 function selectState(state, ownProps) {
   return {

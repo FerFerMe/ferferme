@@ -28,6 +28,8 @@ import {
   revokeSentRequest,
   sendSubscriptionRequest,
   subscribe,
+  disableBansInGroup,
+  enableBansInGroup,
 } from '../redux/action-creators';
 import { USERNAME } from '../utils/hide-criteria';
 import { withKey } from './with-key';
@@ -44,6 +46,7 @@ import { UserProfileHeadActions } from './user-profile-head-actions';
 import { UserProfileHeadStats } from './user-profile-head-stats';
 
 export const UserProfileHead = withRouter(
+  // eslint-disable-next-line complexity
   withKey(({ router }) => router.params.userName)(function UserProfileHead({ router }) {
     const username = router.params.userName.toLowerCase();
     const dispatch = useDispatch();
@@ -108,6 +111,7 @@ export const UserProfileHead = withRouter(
     const canFollowStatLinks =
       user && !isBanned && (isCurrentUser || user.isPrivate === '0' || inSubscriptions);
 
+    const canCheckMeetLinks = user && !isBanned && user.isPrivate === '1';
     // Actions & statuses
     const doShowMedia = useCallback((arg) => dispatch(showMedia(arg)), [dispatch]);
 
@@ -172,6 +176,16 @@ export const UserProfileHead = withRouter(
         (state) => state.userActionsStatuses.blocking[user?.username] || initialAsyncState,
       ),
     };
+    const toggleShowBans = {
+      onClick: useCallback(() => {
+        const bansDisabled = user.youCan.includes('undisable_bans');
+        const updateBans = bansDisabled ? enableBansInGroup : disableBansInGroup;
+        dispatch(updateBans(user.username));
+      }, [dispatch, user]),
+      status: useSelector(
+        (state) => state.userActionsStatuses.blocking[user?.username] || initialAsyncState,
+      ),
+    };
     const unsubFromMe = {
       onClick: useCallback(
         () =>
@@ -191,6 +205,7 @@ export const UserProfileHead = withRouter(
       togglePinned,
       toggleHidden,
       toggleBanned,
+      toggleShowBans,
       unsubFromMe,
     ]
       .map((a) => a.status.errorText)
@@ -296,6 +311,7 @@ export const UserProfileHead = withRouter(
               togglePinned={togglePinned}
               isPinned={isPinned}
               toggleHidden={toggleHidden}
+              toggleShowBans={toggleShowBans}
               isHidden={isHidden}
             />
             <div className={styles.errorsList}>
@@ -308,7 +324,11 @@ export const UserProfileHead = withRouter(
           </>
         )}
 
-        <UserProfileHeadStats user={user} canFollowStatLinks={canFollowStatLinks} />
+        <UserProfileHeadStats
+          user={user}
+          canFollowStatLinks={canFollowStatLinks}
+          canCheckMeetLinks={canCheckMeetLinks}
+        />
 
         {subscrFormOpened && (
           <Portal>

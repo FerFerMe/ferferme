@@ -2,12 +2,15 @@ import { Link } from 'react-router';
 import cn from 'classnames';
 
 import { useSelector } from 'react-redux';
+
+import { faCamera } from '@fortawesome/free-solid-svg-icons/faCamera';
 import { pluralForm } from '../utils';
 import styles from './user-profile-head.module.scss';
 import TimeDisplay from './time-display';
 import UserName from './user-name';
+import { Icon } from './fontawesome-icons';
 
-export const UserProfileHeadStats = ({ user, canFollowStatLinks }) => {
+export const UserProfileHeadStats = ({ user, canFollowStatLinks, canCheckMeetLinks }) => {
   const invitedBy = useSelector((state) => state.invitedByMap[user.username]);
 
   if (!user.statistics) {
@@ -35,8 +38,8 @@ export const UserProfileHeadStats = ({ user, canFollowStatLinks }) => {
           {invitedBy && (
             <li className={styles.statlink}>
               <span className={styles.statlinkText}>
-                <span className={styles.invitedBy}>Invited by</span> @
-                <UserName user={{ username: invitedBy }} />
+                <span className={styles.invitedBy}>Invited by</span>{' '}
+                <UserName user={{ username: invitedBy }}>@{invitedBy}</UserName>
               </span>
             </li>
           )}
@@ -61,6 +64,13 @@ export const UserProfileHeadStats = ({ user, canFollowStatLinks }) => {
               <TimeDisplay inline timeStamp={parseInt(createdAt)} absolute dateOnly />
             </span>
           </li>
+          <IconLink
+            icon={faCamera}
+            title="  Group Call"
+            href={`https://meet.freefeed.me/${username}`}
+            canFollow={canFollowStatLinks}
+            canCheckMeet={canCheckMeetLinks}
+          />
         </ul>
       </div>
     );
@@ -108,8 +118,8 @@ export const UserProfileHeadStats = ({ user, canFollowStatLinks }) => {
         {invitedBy && (
           <li className={styles.statlink}>
             <span className={styles.statlinkText}>
-              <span className={styles.invitedBy}>Invited by</span> @
-              <UserName user={{ username: invitedBy }} />
+              <span className={styles.invitedBy}>Invited by</span>{' '}
+              <UserName user={{ username: invitedBy }}>@{invitedBy}</UserName>
             </span>
           </li>
         )}
@@ -136,6 +146,24 @@ function StatLink({ value, title, linkTo, canFollow, className }) {
       <Link to={linkTo} className={styles.statlinkText}>
         {content}
       </Link>
+    );
+  } else {
+    content = <span className={styles.statlinkText}>{content}</span>;
+  }
+
+  return <li className={cn(styles.statlink, className)}>{content}</li>;
+}
+
+function IconLink({ icon, title, href, canFollow, canCheckMeet, className }) {
+  let content;
+  content = ` ${title}`;
+
+  if (canFollow && canCheckMeet) {
+    content = (
+      <a className={styles.searchButton} href={href}>
+        <Icon icon={icon} className={styles.caret} />
+        {`  Group Call`}
+      </a>
     );
   } else {
     content = <span className={styles.statlinkText}>{content}</span>;

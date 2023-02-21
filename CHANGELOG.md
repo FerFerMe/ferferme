@@ -5,9 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.115] - Not released
+## [1.116] - Not released
+
+## [1.115.1] - 2023-02-14
+### Fixed
+- The "Add comment" input on iOS in the feed view is now correctly focused
+  after creation.
+- Broken lightbox view from the comment preview modal window.
+### Changed
+- The "Comment" link now always opened and focus the "Add comment" input.
+  Previously, a second click closed the input field.
+
+## [1.115] - 2023-02-10
 ### Added
+- Confirmation with short info on click on every "Block user" button.
+- Disabling bans in groups:
+  - Checkbox in group settings (for administrators) to disable/enable bans in
+    groups;
+  - Add "Disable/Enable blocking in group" buttons on group page;
+  - Group group-related actions in drop-down menu in group profile;
+  - New events on Notifications page.
+### Fixed
+- Reload user/group feed after ban/unban and enable/disable bans in group.
 - Show creation time and inviting user in gone user profile.
+- Click on main comment link on a single post page now moves focus to the comment form
 
 ## [1.114] - 2023-01-19
 ### Added
@@ -200,7 +221,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.102.2] - 2021-10-17
 ### Fixed
-- Re-release. 1.102.1 did not include proper version information. 
+- Re-release. 1.102.1 did not include proper version information.
 
 ## [1.102.1] - 2021-10-17
 ### Fixed
@@ -235,14 +256,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.101.2] - 2021-10-07
 ### Fixed
-- Re-release. 1.101.1 did not include proper version information. 
+- Re-release. 1.101.1 did not include proper version information.
 
 ## [1.101.1] - 2021-10-07
 ### Fixed
 - In the old days, users could create groups with groupnames up to 27 characters
   long. Now the client router supports these names.
 
-## [1.101.0] - 2021-09-19 
+## [1.101.0] - 2021-09-19
 ### Added
 - User can adjust the site font size in settings' Appearance tab. This setting
   is saved locally in web browser and can be different for each browser and each
@@ -514,7 +535,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   devices in same network.
 - Tweaked contrast of spoiler-tags (they're WCAG compatible now)
 - Don't close clikes-panel on click inside of it (still close it on click outside)
-- Wait up to 250ms after click to show fully rendered clikes panel. Show throbber if data is not ready after that 
+- Wait up to 250ms after click to show fully rendered clikes panel. Show throbber if data is not ready after that
 
 ## [1.89.3] - 2020-12-18
 ### Fixed
