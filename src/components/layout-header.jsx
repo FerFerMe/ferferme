@@ -68,13 +68,13 @@ export const LayoutHeader = withRouter(function LayoutHeader({ router }) {
   });
 
   const NowruzCM = () => <span>Happy new Persian year</span>;
-  const NowruzCD = ({ days, hours, minutes, seconds, completed }) => {
+  const NowruzCD = ({ completed, formatted }) => {
     if (completed) {
       return <NowruzCM />;
     }
     return (
       <span>
-        {days} d : {hours} h : {minutes} m : {seconds} s
+        {formatted.days} d : {formatted.hours} h : {formatted.minutes} m : {formatted.seconds} s
       </span>
     );
   };
@@ -164,6 +164,7 @@ export const LayoutHeader = withRouter(function LayoutHeader({ router }) {
                 </Link>
               )}
             </h1>
+
             <div className={styles.activeElements}>
               {authenticated && !collapsibleSearchForm && searchForm}
               <span className={styles.buttons}>
