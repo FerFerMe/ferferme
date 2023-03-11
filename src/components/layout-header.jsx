@@ -155,8 +155,9 @@ export const LayoutHeader = withRouter(function LayoutHeader({ router }) {
         ) : (
           <>
             <h1 className={styles.logo}>
-              <IndexLink className={styles.logoLink} to="/" />
-              <Logo />
+              <IndexLink className={styles.logoLink} to="/">
+                <Logo />
+              </IndexLink>
               {CONFIG.betaChannel.enabled && CONFIG.betaChannel.isBeta && (
                 <Link to="/settings/appearance#beta" className="site-logo-subheading">
                   {CONFIG.betaChannel.subHeading}
