@@ -39,7 +39,7 @@ $without-sidebar: '(max-width: 991px)';
   background: linear-gradient(to right, #d43e1b 0, #f9b616 100pt);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  font-size: 13pt;
+  font-size: 11pt;
   text-align: center;
   width: 227px;
   @media #{$with-sidebar} {
@@ -54,7 +54,7 @@ $without-sidebar: '(max-width: 991px)';
 
 .logo {
   flex: 1;
-  margin: 0;
+  margin: -10px 0 0;
   white-space: nowrap;
   font-size: 36px; // fluid's fallback size
   font-size: fluid(28, 320, 36, 600);
