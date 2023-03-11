@@ -39,16 +39,16 @@ $without-sidebar: '(max-width: 991px)';
   background: linear-gradient(to right, #d43e1b 0, #f9b616 100pt);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  font-size: fluid(11, 320, 14.5, 600);
+  font-size: 13pt;
+  text-align: center;
+  width: 227px;
   @media #{$with-sidebar} {
     margin-left: 10px;
     margin-right: 10px;
-    width: 688px;
   }
   @media #{$without-sidebar} {
     margin-left: 0;
     margin-right: 0;
-    width: 100%;
   }
 }
 
