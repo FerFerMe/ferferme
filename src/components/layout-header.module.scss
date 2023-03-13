@@ -37,18 +37,17 @@ $without-sidebar: '(max-width: 991px)';
   margin-bottom: 20px;
   text-transform: uppercase;
   background: linear-gradient(to right, #d43e1b 0, #f9b616 100pt);
-  -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  -webkit-background-clip: text;
   font-size: 11pt;
-  text-align: center;
-  width: 227px;
+  width: 293px;
   @media #{$with-sidebar} {
-    margin-left: 10px;
-    margin-right: 10px;
+    margin-left: 15px;
+    margin-right: 15px;
   }
   @media #{$without-sidebar} {
-    margin-left: 0;
-    margin-right: 0;
+    margin-left: 5px;
+    margin-right: 5px;
   }
 }
 
