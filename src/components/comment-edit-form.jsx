@@ -1,8 +1,12 @@
 /* global CONFIG */
 import { useMemo, useCallback, useState, useRef, useEffect, forwardRef, useContext } from 'react';
 import cn from 'classnames';
+import data from '@emoji-mart/data';
+import Picker from '@emoji-mart/react';
+import { Portal } from 'react-portal';
+import GifPicker from 'gif-picker-react';
 
-import { faPaperclip } from '@fortawesome/free-solid-svg-icons';
+import { faPaperclip, faSmile } from '@fortawesome/free-solid-svg-icons';
 import { initialAsyncState } from '../redux/async-helpers';
 import { insertText } from '../utils/insert-text';
 import { Throbber } from './throbber';
@@ -11,9 +15,14 @@ import { PreventPageLeaving } from './prevent-page-leaving';
 import { ButtonLink } from './button-link';
 import { useUploader, useFileChooser } from './hooks/uploads';
 import { Icon } from './fontawesome-icons';
+import { faGif } from './fontawesome-custom-icons';
+
 import { SubmitModeHint } from './submit-mode-hint';
-import { SubmittableTextarea } from './submittable-textarea';
+import { SubmittableTextarea } from './mention-textarea';
+import { OverlayPopup } from './overlay-popup';
+import { tenorApiKey } from './tenor-api-key';
 import { PostContext } from './post/post-context';
+import styles from './overlay-popup.module.scss';
 
 export const CommentEditForm = forwardRef(function CommentEditForm(
   {
@@ -31,7 +40,11 @@ export const CommentEditForm = forwardRef(function CommentEditForm(
   const { setInput } = useContext(PostContext);
   const input = useRef(null);
   const [text, setText] = useState(initialText);
-  const onChange = useCallback((e) => setText(e.target.value), []);
+  const [emojiActive, setemojiActive] = useState(false);
+  const [gifActive, setgifActive] = useState(false);
+
+  const onChange = useCallback((e) => setText(e), []);
+
   const canSubmit = useMemo(
     () => !submitStatus.loading && text.trim() !== '',
     [submitStatus.loading, text],
@@ -106,6 +119,15 @@ export const CommentEditForm = forwardRef(function CommentEditForm(
 
   const disabled = !canSubmit || submitStatus.loading || filesLoading;
 
+  function setEmoji(emoji) {
+    setText(`${text}${emoji}`);
+  }
+
+  function setGif(gif) {
+    setText(`${text} ${gif}`);
+    setgifActive(false);
+  }
+
   return (
     <div className="comment-body" role="form">
       <PreventPageLeaving prevent={canSubmit || submitStatus.loading} />
@@ -141,7 +163,6 @@ export const CommentEditForm = forwardRef(function CommentEditForm(
         >
           Comment
         </button>
-
         {!isPersistent && (
           <ButtonLink
             className="comment-cancel"
@@ -152,9 +173,7 @@ export const CommentEditForm = forwardRef(function CommentEditForm(
             Cancel
           </ButtonLink>
         )}
-
         <SubmitModeHint input={input} />
-
         <ButtonLink
           className="comment-file-button iconic-button"
           title="Add photo or file"
@@ -162,7 +181,65 @@ export const CommentEditForm = forwardRef(function CommentEditForm(
         >
           <Icon icon={faPaperclip} />
         </ButtonLink>
-
+        <ButtonLink
+          className="comment-file-button iconic-button"
+          title="Add Gif"
+          /* eslint-disable-next-line react/jsx-no-bind */
+          onClick={() => {
+            setgifActive(!gifActive);
+          }}
+        >
+          <Icon icon={faGif} />
+        </ButtonLink>
+        {gifActive && (
+          <>
+            <OverlayPopup
+              /* eslint-disable-next-line react/jsx-no-bind */
+              close={() => {
+                setgifActive(false);
+                input.current?.focus();
+              }}
+            >
+              <GifPicker
+                /* eslint-disable-next-line react/jsx-no-bind */
+                onGifClick={(gif) => setGif(gif.url)}
+                theme="auto"
+                tenorApiKey={tenorApiKey}
+              />
+            </OverlayPopup>
+          </>
+        )}
+        <ButtonLink
+          className="comment-file-button iconic-button"
+          title="Add Emoji"
+          /* eslint-disable-next-line react/jsx-no-bind */
+          onClick={() => {
+            setemojiActive(!emojiActive);
+          }}
+        >
+          <Icon icon={faSmile} />
+        </ButtonLink>
+        {emojiActive && (
+          <>
+            <Portal>
+              <div className={styles.popup}>
+                <div className={styles.content}>
+                  <Picker
+                    autoFocus={true}
+                    /* eslint-disable-next-line react/jsx-no-bind */
+                    onClickOutside={() => {
+                      setemojiActive(false);
+                      input.current?.focus();
+                    }}
+                    data={data}
+                    /* eslint-disable-next-line react/jsx-no-bind */
+                    onEmojiSelect={(emoji) => setEmoji(emoji.native)}
+                  />
+                </div>
+              </div>
+            </Portal>
+          </>
+        )}
         {submitStatus.loading && <Throbber className="comment-throbber" />}
         {submitStatus.error && <span className="comment-error">{submitStatus.errorText}</span>}
       </div>

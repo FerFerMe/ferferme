@@ -1,9 +1,7 @@
 import { PureComponent } from 'react';
-import { faFileVideo, faPlayCircle } from '@fortawesome/free-regular-svg-icons';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 
 import { formatFileSize } from '../../utils';
-import { ButtonLink } from '../button-link';
 import { Icon } from '../fontawesome-icons';
 
 class VideoAttachment extends PureComponent {
@@ -21,35 +19,19 @@ class VideoAttachment extends PureComponent {
 
   render() {
     const { props } = this;
-    const { isOpen } = this.state;
     const formattedFileSize = formatFileSize(props.fileSize);
 
     const title = `${props.fileName} (${formattedFileSize})`;
 
     return (
       <div className="attachment" role="figure" aria-label={`Video attachment ${title}`}>
-        {isOpen ? (
-          <div>
-            <video title={title} autoPlay controls>
-              <source src={props.url} />
-              Your browser does not support HTML5 video tag.
-            </video>
-          </div>
-        ) : (
-          <ButtonLink
-            onClick={this.toggleOpen}
-            className="video-attachment-click-to-play"
-            title="Click to play video"
-          >
-            <Icon icon={faPlayCircle} />
-          </ButtonLink>
-        )}
         <div>
-          <a href={props.url} title={title} target="_blank">
-            <Icon icon={faFileVideo} className="attachment-icon" />
-            <span>{title}</span>
-          </a>
-
+          <video title={title} preload="metadata" muted controls>
+            <source src={props.url} />
+            Your browser does not support HTML5 video tag.
+          </video>
+        </div>
+        <div>
           {props.isEditing && (
             <Icon
               icon={faTimes}

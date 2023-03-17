@@ -65,18 +65,38 @@
   }
 }
 
-.mobile-shortcuts {
-  margin: 0 15px rem(20px) calc(15px - 1em);
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  max-width: rem(450px);
-}
+.bottom-navbar {
+  background-color: #edf1f5;
+  position: fixed;
+  bottom: 0;
+  max-width: 750px;
+  width: 100%;
+  z-index: 3;
+  height: 50px;
 
-.mobile-shortcut-link {
-  margin-left: 1em;
-  margin-bottom: 0.5em;
-  white-space: nowrap;
+  .bottom-navbar-row {
+    float: left;
+    width: 25%;
+    display: block;
+    text-align: center;
+    padding: 10px;
+    font-size: rem(20px);
+
+    a:link {
+      color: #54a5f0;
+      text-decoration: none;
+    }
+
+    a:visited {
+      color: #54a5f0;
+      text-decoration: none;
+    }
+
+    a:hover {
+      color: #54a5f0;
+      text-decoration: none;
+    }
+  }
 }
 
 .signin-link {

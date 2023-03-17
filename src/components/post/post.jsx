@@ -6,6 +6,10 @@ import classnames from 'classnames';
 import _ from 'lodash';
 import dateFormat from 'date-fns/format';
 import * as Sentry from '@sentry/react';
+import data from '@emoji-mart/data';
+import Picker from '@emoji-mart/react';
+import { Portal } from 'react-portal';
+import GifPicker from 'gif-picker-react';
 import {
   faExclamationTriangle,
   faLock,
@@ -14,6 +18,7 @@ import {
   faAngleDoubleRight,
   faPaperclip,
   faShare,
+  faSmile,
 } from '@fortawesome/free-solid-svg-icons';
 
 import { pluralForm } from '../../utils';
@@ -38,9 +43,13 @@ import { destinationsPrivacy } from '../select-utils';
 import { Icon } from '../fontawesome-icons';
 import { UserPicture } from '../user-picture';
 import { SubmitModeHint } from '../submit-mode-hint';
-import { SubmittableTextarea } from '../submittable-textarea';
+import { faGif } from '../fontawesome-custom-icons';
+import { SubmittableTextarea } from '../mention-textarea';
+import { OverlayPopup } from '../overlay-popup';
+import { tenorApiKey } from '../tenor-api-key';
 
 import { prepareAsyncFocus } from '../../utils/prepare-async-focus';
+import styles from '../overlay-popup.module.scss';
 import { UnhideOptions, HideLink } from './post-hides-ui';
 import PostMoreLink from './post-more-link';
 import PostLikeLink from './post-like-link';
@@ -66,6 +75,17 @@ class Post extends Component {
     editingAttachments: [],
     dropzoneDisabled: false,
     unHideOpened: false,
+    emojiActive: false,
+    gifActive: false,
+  };
+
+  setEmoji = (emoji) => {
+    this.setState({ editingText: `${this.state.editingText}${emoji}` });
+  };
+
+  setGif = (gif) => {
+    this.setState({ editingText: `${this.state.editingText} ${gif}` });
+    this.setState({ gifActive: false });
   };
 
   handleDropzoneInit = (d) => {
@@ -178,8 +198,31 @@ class Post extends Component {
     this.props.enableComments(this.props.id);
   };
 
+  doTranslate = () => {
+    const xhttp = new XMLHttpRequest();
+    xhttp.open(
+      'GET',
+      `https://script.google.com/macros/s/AKfycbyTMpl4oDrxRoCMSKl2-3HSyQZojjvJxJ2QGlO3M21ybqTzpLwXWlaO5BdznBVZcyTfZA/exec?text=${this.props.body}`,
+      false,
+    );
+    xhttp.send();
+    document.querySelector(
+      `#b-${this.props.id}`,
+    ).innerHTML = `<span class="Linkify" dir="auto" role="region">${xhttp.responseText}</span>`;
+    document.querySelector(`#tr-${this.props.id}`).style.display = 'none';
+    document.querySelector(`#u-tr-${this.props.id}`).style.display = 'inline';
+  };
+
+  undoTranslate = () => {
+    document.querySelector(
+      `#b-${this.props.id}`,
+    ).innerHTML = `<span class="Linkify" dir="auto" role="region">${this.props.body}</span>`;
+    document.querySelector(`#tr-${this.props.id}`).style.display = 'inline';
+    document.querySelector(`#u-tr-${this.props.id}`).style.display = 'none';
+  };
+
   handlePostTextChange = (e) => {
-    this.setState({ editingText: e.target.value });
+    this.setState({ editingText: e });
   };
 
   toggleEditingPost = () => {
@@ -406,6 +449,17 @@ class Post extends Component {
         false
       );
 
+    const translate = (
+      <ButtonLink className="post-action" onClick={this.doTranslate}>
+        Translate
+      </ButtonLink>
+    );
+
+    const untranslate = (
+      <ButtonLink className="post-action" onClick={this.undoTranslate}>
+        Original
+      </ButtonLink>
+    );
     // "More" menu
     const moreLink = (
       <PostMoreLink
@@ -485,6 +539,16 @@ class Post extends Component {
                   {this.renderHideLink()}
                 </span>
               )}
+              <span className="post-footer-item" id={`tr-${this.props.id}`}>
+                {translate}
+              </span>
+              <span
+                style={{ display: 'none' }}
+                className="post-footer-item"
+                id={`u-tr-${this.props.id}`}
+              >
+                {untranslate}
+              </span>
               <span className="post-footer-item">{moreLink}</span>
             </span>
           </div>
@@ -608,7 +672,68 @@ class Post extends Component {
                       >
                         <Icon icon={faPaperclip} className="upload-icon" /> Add photos or files
                       </span>
+                      {' | '}
+                      <span
+                        className="post-edit-attachments"
+                        role="button"
+                        /* eslint-disable-next-line react/jsx-no-bind */
+                        onClick={() => {
+                          this.setState({ gifActive: !this.state.gifActive });
+                        }}
+                      >
+                        <Icon icon={faGif} className="upload-icon" /> Add Gif
+                      </span>
+                      {' | '}
+                      <span
+                        className="post-edit-attachments"
+                        role="button"
+                        /* eslint-disable-next-line react/jsx-no-bind */
+                        onClick={() => {
+                          this.setState({ emojiActive: !this.state.emojiActive });
+                        }}
+                      >
+                        <Icon icon={faSmile} className="upload-icon" />
+                      </span>
                     </div>
+                    {this.state.gifActive && (
+                      <>
+                        <OverlayPopup
+                          /* eslint-disable-next-line react/jsx-no-bind */
+                          close={() => {
+                            this.setState({ gifActive: false });
+                            this.textareaRef.current?.focus();
+                          }}
+                        >
+                          <GifPicker
+                            /* eslint-disable-next-line react/jsx-no-bind */
+                            onGifClick={(gif) => this.setGif(gif.url)}
+                            theme="auto"
+                            tenorApiKey={tenorApiKey}
+                          />
+                        </OverlayPopup>
+                      </>
+                    )}
+                    {this.state.emojiActive && (
+                      <>
+                        <Portal>
+                          <div className={styles.popup}>
+                            <div className={styles.content}>
+                              <Picker
+                                autoFocus={true}
+                                /* eslint-disable-next-line react/jsx-no-bind */
+                                onClickOutside={() => {
+                                  this.setState({ emojiActive: false });
+                                  this.textareaRef.current?.focus();
+                                }}
+                                data={data}
+                                /* eslint-disable-next-line react/jsx-no-bind */
+                                onEmojiSelect={(emoji) => this.setEmoji(emoji.native)}
+                              />
+                            </div>
+                          </div>
+                        </Portal>
+                      </>
+                    )}
 
                     <SubmitModeHint input={this.textareaRef} className="post-edit-hint" />
 
@@ -644,12 +769,14 @@ class Post extends Component {
                 </div>
               ) : (
                 <div className="post-text">
-                  <PieceOfText
-                    text={props.body}
-                    readMoreStyle={props.readMoreStyle}
-                    highlightTerms={props.highlightTerms}
-                    showMedia={this.props.showMedia}
-                  />
+                  <span id={`b-${this.props.id}`}>
+                    <PieceOfText
+                      text={props.body}
+                      readMoreStyle={props.readMoreStyle}
+                      highlightTerms={props.highlightTerms}
+                      showMedia={this.props.showMedia}
+                    />
+                  </span>
                 </div>
               )}
             </div>

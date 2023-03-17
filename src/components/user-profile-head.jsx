@@ -46,6 +46,7 @@ import { UserProfileHeadActions } from './user-profile-head-actions';
 import { UserProfileHeadStats } from './user-profile-head-stats';
 
 export const UserProfileHead = withRouter(
+  // eslint-disable-next-line complexity
   withKey(({ router }) => router.params.userName)(function UserProfileHead({ router }) {
     const username = router.params.userName.toLowerCase();
     const dispatch = useDispatch();
@@ -110,6 +111,7 @@ export const UserProfileHead = withRouter(
     const canFollowStatLinks =
       user && !isBanned && (isCurrentUser || user.isPrivate === '0' || inSubscriptions);
 
+    const canCheckMeetLinks = user && !isBanned && user.isPrivate === '1';
     // Actions & statuses
     const doShowMedia = useCallback((arg) => dispatch(showMedia(arg)), [dispatch]);
 
@@ -322,7 +324,11 @@ export const UserProfileHead = withRouter(
           </>
         )}
 
-        <UserProfileHeadStats user={user} canFollowStatLinks={canFollowStatLinks} />
+        <UserProfileHeadStats
+          user={user}
+          canFollowStatLinks={canFollowStatLinks}
+          canCheckMeetLinks={canCheckMeetLinks}
+        />
 
         {subscrFormOpened && (
           <Portal>
