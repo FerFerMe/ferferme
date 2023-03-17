@@ -83,10 +83,21 @@ export const LayoutHeader = withRouter(function LayoutHeader({ router }) {
     );
   };
   const confetti = () => {
+    const { body } = document,
+      html = document.documentElement;
+
+    const height = Math.max(
+      body.scrollHeight,
+      body.offsetHeight,
+      html.clientHeight,
+      html.scrollHeight,
+      html.offsetHeight,
+    );
+
     ReactDOM.render(
       <Confetti
         width={window.innerWidth}
-        height={window.innerHeight}
+        height={height}
         numberOfPieces={700}
         gravity={0.05}
         recycle={false}
