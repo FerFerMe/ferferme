@@ -205,7 +205,7 @@ export const LayoutHeader = withRouter(function LayoutHeader({ router }) {
       </header>
       <div className={cn(styles.nowruz)}>
         {/* eslint-disable-next-line react/jsx-no-bind */}
-        <Countdown date={1679082774000} renderer={NowruzCD} onComplete={confetti} />
+        <Countdown date={1679347468000} renderer={NowruzCD} onComplete={confetti} />
         <div id={'confetti'} />
       </div>
     </>
