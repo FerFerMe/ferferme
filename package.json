@@ -31,6 +31,7 @@
     "porter-stemmer": "~0.9.1",
     "prop-types": "~15.8.1",
     "react": "~17.0.2",
+    "react-confetti": "^6.1.0",
     "react-countdown": "^2.3.5",
     "react-dom": "~17.0.2",
     "react-dropzone-component": "~3.2.0",
