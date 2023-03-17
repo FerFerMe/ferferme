@@ -15,6 +15,7 @@ import { useMediaQuery } from './hooks/media-query';
 import styles from './layout-header.module.scss';
 import { SignInLink } from './sign-in-link';
 import Logo from './freefeed-logo';
+
 export const LayoutHeader = withRouter(function LayoutHeader({ router }) {
   const dispatch = useDispatch();
   const onSearchPage = router.routes[router.routes.length - 1].name === 'search';
