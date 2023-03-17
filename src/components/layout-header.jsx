@@ -6,14 +6,15 @@ import cn from 'classnames';
 import { KEY_ESCAPE } from 'keycode-js';
 import { useDispatch, useSelector } from 'react-redux';
 import Countdown from 'react-countdown';
-
+import Confetti from 'react-confetti';
+import ReactDOM from 'react-dom';
 import { openSidebar } from '../redux/action-creators';
+
 import { Icon } from './fontawesome-icons';
 import { useMediaQuery } from './hooks/media-query';
 import styles from './layout-header.module.scss';
 import { SignInLink } from './sign-in-link';
 import Logo from './freefeed-logo';
-
 export const LayoutHeader = withRouter(function LayoutHeader({ router }) {
   const dispatch = useDispatch();
   const onSearchPage = router.routes[router.routes.length - 1].name === 'search';
@@ -22,6 +23,7 @@ export const LayoutHeader = withRouter(function LayoutHeader({ router }) {
   const isNarrowScreen = useMediaQuery('(max-width: 549px)');
 
   const authenticated = useSelector((state) => state.authenticated);
+  const screenName = useSelector((state) => state.user.screenName);
 
   const [searchExpanded, setSearchExpanded] = useState(false);
   const [query, setQuery] = useState('');
@@ -68,7 +70,7 @@ export const LayoutHeader = withRouter(function LayoutHeader({ router }) {
     onBlur: closeSearchForm,
   });
 
-  const NowruzCM = () => <span>Happy new Persian year</span>;
+  const NowruzCM = () => <span>Happy new year {authenticated && `dear ${screenName}`}</span>;
   const NowruzCD = ({ completed, formatted }) => {
     if (completed) {
       return <NowruzCM />;
@@ -77,6 +79,19 @@ export const LayoutHeader = withRouter(function LayoutHeader({ router }) {
       <span>
         {formatted.days} d : {formatted.hours} h : {formatted.minutes} m : {formatted.seconds} s
       </span>
+    );
+  };
+  const confetti = () => {
+    ReactDOM.render(
+      <Confetti
+        width={window.innerWidth}
+        height={window.innerHeight}
+        numberOfPieces={700}
+        gravity={0.05}
+        recycle={false}
+        friction={0.99}
+      />,
+      document.querySelector('#confetti'),
     );
   };
 
@@ -190,7 +205,8 @@ export const LayoutHeader = withRouter(function LayoutHeader({ router }) {
       </header>
       <div className={cn(styles.nowruz)}>
         {/* eslint-disable-next-line react/jsx-no-bind */}
-        <Countdown date={1679347468000} renderer={NowruzCD} />
+        <Countdown date={1679082044000} renderer={NowruzCD} onComplete={confetti} />
+        <div id={'confetti'} />
       </div>
     </>
   );

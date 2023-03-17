@@ -35,12 +35,12 @@ $without-sidebar: '(max-width: 991px)';
 
 .nowruz {
   margin-bottom: 20px;
-  text-transform: uppercase;
+  text-transform: capitalize;
   background: linear-gradient(to right, #d43e1b 0, #f9b616 100pt);
   -webkit-text-fill-color: transparent;
   -webkit-background-clip: text;
   font-size: 11pt;
-  width: 293px;
+  width: 265px;
   @media #{$with-sidebar} {
     margin-left: 15px;
     margin-right: 15px;

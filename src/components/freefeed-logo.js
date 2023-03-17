@@ -4,8 +4,8 @@ const SvgComponent = (props) => (
     version="1.2"
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 2160 368"
-    width="300"
-    height="51"
+    width="275"
+    height="46"
     {...props}
   >
     <title>newruz-svg-new-svg</title>
