@@ -18,6 +18,7 @@ $without-sidebar: '(max-width: 991px)';
   display: flex;
   align-items: center;
   margin-top: 20px;
+  margin-bottom: 20px;
   position: relative;
   @include with-gap;
 
@@ -33,27 +34,9 @@ $without-sidebar: '(max-width: 991px)';
   }
 }
 
-.nowruz {
-  margin-bottom: 20px;
-  text-transform: capitalize;
-  background: linear-gradient(to right, #d43e1b 0, #f9b616 100pt);
-  -webkit-text-fill-color: transparent;
-  -webkit-background-clip: text;
-  font-size: 11pt;
-  width: 265px;
-  @media #{$with-sidebar} {
-    margin-left: 15px;
-    margin-right: 15px;
-  }
-  @media #{$without-sidebar} {
-    margin-left: 5px;
-    margin-right: 5px;
-  }
-}
-
 .logo {
   flex: 1;
-  margin: -10px 0 0;
+  margin: 0;
   white-space: nowrap;
   font-size: 36px; // fluid's fallback size
   font-size: fluid(28, 320, 36, 600);

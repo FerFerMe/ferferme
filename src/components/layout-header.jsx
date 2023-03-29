@@ -5,16 +5,12 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import cn from 'classnames';
 import { KEY_ESCAPE } from 'keycode-js';
 import { useDispatch, useSelector } from 'react-redux';
-import Countdown from 'react-countdown';
-import Confetti from 'react-confetti';
-import ReactDOM from 'react-dom';
-import { openSidebar } from '../redux/action-creators';
 
+import { openSidebar } from '../redux/action-creators';
 import { Icon } from './fontawesome-icons';
 import { useMediaQuery } from './hooks/media-query';
 import styles from './layout-header.module.scss';
 import { SignInLink } from './sign-in-link';
-import Logo from './freefeed-logo';
 
 export const LayoutHeader = withRouter(function LayoutHeader({ router }) {
   const dispatch = useDispatch();
@@ -24,7 +20,6 @@ export const LayoutHeader = withRouter(function LayoutHeader({ router }) {
   const isNarrowScreen = useMediaQuery('(max-width: 549px)');
 
   const authenticated = useSelector((state) => state.authenticated);
-  const screenName = useSelector((state) => state.user.screenName);
 
   const [searchExpanded, setSearchExpanded] = useState(false);
   const [query, setQuery] = useState('');
@@ -70,42 +65,6 @@ export const LayoutHeader = withRouter(function LayoutHeader({ router }) {
     onFocus,
     onBlur: closeSearchForm,
   });
-
-  const NowruzCM = () => <span>Happy new year {authenticated && `dear ${screenName}`}</span>;
-  const NowruzCD = ({ completed, formatted }) => {
-    if (completed) {
-      return <NowruzCM />;
-    }
-    return (
-      <span>
-        {formatted.days} d : {formatted.hours} h : {formatted.minutes} m : {formatted.seconds} s
-      </span>
-    );
-  };
-  const confetti = () => {
-    const { body } = document,
-      html = document.documentElement;
-
-    const height = Math.max(
-      body.scrollHeight,
-      body.offsetHeight,
-      html.clientHeight,
-      html.scrollHeight,
-      html.offsetHeight,
-    );
-
-    ReactDOM.render(
-      <Confetti
-        width={window.innerWidth}
-        height={height}
-        numberOfPieces={700}
-        gravity={0.05}
-        recycle={false}
-        friction={0.99}
-      />,
-      document.querySelector('#confetti'),
-    );
-  };
 
   const searchForm = (
     <form className={styles.searchForm} action="/search" onSubmit={onSubmit}>
@@ -165,62 +124,54 @@ export const LayoutHeader = withRouter(function LayoutHeader({ router }) {
     ));
 
   return (
-    <>
-      <header
-        className={cn(
-          styles.header,
-          fullSearchForm && styles.fullMode,
-          compactSearchForm && styles.compactMode,
-          collapsibleSearchForm && styles.collapsibleMode,
-        )}
-      >
-        {searchExpanded ? (
-          <div className={styles.searchExpandedCont}>
-            {authenticated && searchForm}
-            {sidebarButton}
-          </div>
-        ) : (
-          <>
-            <h1 className={styles.logo}>
-              <IndexLink className={styles.logoLink} to="/">
-                <Logo />
-              </IndexLink>
-              {CONFIG.betaChannel.enabled && CONFIG.betaChannel.isBeta && (
-                <Link to="/settings/appearance#beta" className="site-logo-subheading">
-                  {CONFIG.betaChannel.subHeading}
-                </Link>
+    <header
+      className={cn(
+        styles.header,
+        fullSearchForm && styles.fullMode,
+        compactSearchForm && styles.compactMode,
+        collapsibleSearchForm && styles.collapsibleMode,
+      )}
+    >
+      {searchExpanded ? (
+        <div className={styles.searchExpandedCont}>
+          {authenticated && searchForm}
+          {sidebarButton}
+        </div>
+      ) : (
+        <>
+          <h1 className={styles.logo}>
+            <IndexLink className={styles.logoLink} to="/">
+              {CONFIG.siteTitle}
+            </IndexLink>
+            {CONFIG.betaChannel.enabled && CONFIG.betaChannel.isBeta && (
+              <Link to="/settings/appearance#beta" className="site-logo-subheading">
+                {CONFIG.betaChannel.subHeading}
+              </Link>
+            )}
+          </h1>
+          <div className={styles.activeElements}>
+            {authenticated && !collapsibleSearchForm && searchForm}
+            <span className={styles.buttons}>
+              {authenticated && collapsibleSearchForm && (
+                <button
+                  type="button"
+                  aria-label="Open search form"
+                  title="Open search form"
+                  onClick={openSearchForm}
+                  className={styles.compactButton}
+                >
+                  <Icon icon={faSearch} />
+                </button>
               )}
-            </h1>
-
-            <div className={styles.activeElements}>
-              {authenticated && !collapsibleSearchForm && searchForm}
-              <span className={styles.buttons}>
-                {authenticated && collapsibleSearchForm && (
-                  <button
-                    type="button"
-                    aria-label="Open search form"
-                    title="Open search form"
-                    onClick={openSearchForm}
-                    className={styles.compactButton}
-                  >
-                    <Icon icon={faSearch} />
-                  </button>
-                )}
-                {sidebarButton}
-              </span>
-            </div>
-          </>
-        )}
-        {isLayoutWithSidebar && !authenticated && (
-          <SignInLink className={styles.signInLink}>Sign In</SignInLink>
-        )}
-      </header>
-      <div className={cn(styles.nowruz)}>
-        {/* eslint-disable-next-line react/jsx-no-bind */}
-        <Countdown date={1679347468000} renderer={NowruzCD} onComplete={confetti} />
-        <div id={'confetti'} />
-      </div>
-    </>
+              {sidebarButton}
+            </span>
+          </div>
+        </>
+      )}
+      {isLayoutWithSidebar && !authenticated && (
+        <SignInLink className={styles.signInLink}>Sign In</SignInLink>
+      )}
+    </header>
   );
 });
 
