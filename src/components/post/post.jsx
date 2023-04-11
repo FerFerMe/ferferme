@@ -197,22 +197,21 @@ class Post extends Component {
   enableComments = () => {
     this.props.enableComments(this.props.id);
   };
-
-  doTranslate = () => {
-    const xhttp = new XMLHttpRequest();
-    xhttp.open(
-      'GET',
-      `https://script.google.com/macros/s/AKfycbyTMpl4oDrxRoCMSKl2-3HSyQZojjvJxJ2QGlO3M21ybqTzpLwXWlaO5BdznBVZcyTfZA/exec?text=${this.props.body}`,
-      false,
-    );
-    xhttp.send();
-    document.querySelector(
-      `#b-${this.props.id}`,
-    ).innerHTML = `<span class="Linkify" dir="auto" role="region">${xhttp.responseText}</span>`;
-    document.querySelector(`#tr-${this.props.id}`).style.display = 'none';
-    document.querySelector(`#u-tr-${this.props.id}`).style.display = 'inline';
+  doTranslate = async () => {
+    try {
+      const response = await fetch(
+        `https://script.google.com/macros/s/AKfycbyTMpl4oDrxRoCMSKl2-3HSyQZojjvJxJ2QGlO3M21ybqTzpLwXWlaO5BdznBVZcyTfZA/exec?text=${this.props.body}`,
+      );
+      const translatedText = await response.text();
+      document.querySelector(
+        `#b-${this.props.id}`,
+      ).innerHTML = `<span class="Linkify" dir="auto" role="region">${translatedText}</span>`;
+      document.querySelector(`#tr-${this.props.id}`).style.display = 'none';
+      document.querySelector(`#u-tr-${this.props.id}`).style.display = 'inline';
+    } catch (error) {
+      console.error(error);
+    }
   };
-
   undoTranslate = () => {
     document.querySelector(
       `#b-${this.props.id}`,
