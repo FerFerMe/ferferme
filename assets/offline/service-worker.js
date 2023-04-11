@@ -1,7 +1,7 @@
 const CACHE_NAME = 'offline';
 
 // Customize this with a different URL if needed.
-const OFFLINE_URL = `${location.origin}/offline.html`;
+const OFFLINE_URL = `${location.origin}/offline-page.html`;
 
 self.addEventListener('install', (event) => {
     event.waitUntil(

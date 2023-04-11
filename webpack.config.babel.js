@@ -65,7 +65,7 @@ const config = {
         'assets/images/favicon.*',
         'assets/images/ios/*.png',
         'assets/ext-auth/auth-return.html',
-        'assets/offline/offline.html',
+        'assets/offline/offline-page.html',
         'assets/offline/service-worker.js',
         opts.dev && { from: 'config.json', noErrorOnMissing: true },
       ]),
