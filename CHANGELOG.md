@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.118] - Not released
 
+## [1.117.1] - 2023-04-01
+### Fixed
+- Hiding attachments under the 'read more' fold
+
 ## [1.117] - 2023-03-31
 ### Added
 - A new "Mention @username" item has been added to the post's dropdown menu.
