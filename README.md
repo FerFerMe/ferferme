@@ -1,7 +1,6 @@
 # Usage
 
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FFreeFeed%2Ffreefeed-react-client.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2FFreeFeed%2Ffreefeed-react-client?ref=badge_shield)
-
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FFerFerMe%2Fferferme.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FFerFerMe%2Fferferme?ref=badge_shield)
 [Node.js](https://nodejs.org) 14 or 16 is supported.
 
 We use [yarn](https://yarnpkg.com/) as dependency manager (instead of npm) so you need to install it and run `yarn` after downloading this code. If you're using Windows, you should install developer tools by using `npm install --global --production windows-build-tools` from an elevated PowerShell or CMD.exe (run as Administrator).
@@ -37,4 +36,5 @@ example) you can create an empty `.no_husky` file in the root directory of proje
 
 ## License
 
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FFreeFeed%2Ffreefeed-react-client.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2FFreeFeed%2Ffreefeed-react-client?ref=badge_large)
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FFerFerMe%2Fferferme.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FFerFerMe%2Fferferme?ref=badge_large)
