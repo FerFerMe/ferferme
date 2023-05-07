@@ -179,7 +179,7 @@ export function CommentEditForm({
               <GifPicker
                 /* eslint-disable-next-line react/jsx-no-bind */
                 onGifClick={(gif) => setGif(gif.url)}
-                theme="auto"
+                theme={localStorage.getItem(window.CONFIG.appearance.colorSchemeStorageKey)}
                 tenorApiKey={tenorApiKey}
               />
             </OverlayPopup>
@@ -202,6 +202,7 @@ export function CommentEditForm({
                 <div className={styles.content}>
                   <Picker
                     autoFocus={true}
+                    theme={localStorage.getItem(window.CONFIG.appearance.colorSchemeStorageKey)}
                     /* eslint-disable-next-line react/jsx-no-bind */
                     onClickOutside={() => {
                       setemojiActive(false);
