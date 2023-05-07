@@ -6,6 +6,8 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector, useStore } from 'react-redux';
+import GifPicker from 'gif-picker-react';
+import { tenorApiKey } from '../../utils/tenor-api-key';
 import { Icon } from '../fontawesome-icons';
 import { SmartTextarea } from '../smart-textarea';
 import { SubmitModeHint } from '../submit-mode-hint';
@@ -21,6 +23,8 @@ import { Selector } from '../feeds-selector/selector';
 import { EDIT_DIRECT, EDIT_REGULAR } from '../feeds-selector/constants';
 import { ButtonLink } from '../button-link';
 import { usePrivacyCheck } from '../feeds-selector/privacy-check';
+import { OverlayPopup } from '../overlay-popup';
+import { faGif } from '../fontawesome-custom-icons';
 import PostAttachments from './post-attachments';
 
 const selectMaxFilesCount = (serverInfo) => serverInfo.attachments.maxCountPerPost;
@@ -37,8 +41,15 @@ export function PostEditForm({ id, isDirect, recipients, createdBy, body, attach
   const [feeds, setFeeds] = useState(recipientNames);
   const [postText, setPostText] = useState(body);
   const [privacyWarning, setPrivacyWarning] = useState(null);
+  const [gifActive, setgifActive] = useState(false);
 
   const textareaRef = useRef();
+
+  const setGif = (gif) => {
+    textareaRef.current?.focus();
+    setPostText(`${postText} ${gif}`);
+    setgifActive(false);
+  };
 
   // Uploading files
   const { isUploading, fileIds, uploadFile, uploadProgressProps, postAttachmentsProps } =
@@ -201,6 +212,35 @@ export function PostEditForm({ id, isDirect, recipients, createdBy, body, attach
             >
               <Icon icon={faPaperclip} className="upload-icon" /> Add photos or files
             </ButtonLink>
+            {' | '}
+            <ButtonLink
+              className="post-edit-attachments"
+              role="button"
+              /* eslint-disable-next-line react/jsx-no-bind */
+              onClick={() => {
+                setgifActive(!gifActive);
+              }}
+            >
+              <Icon icon={faGif} className="upload-icon" />
+            </ButtonLink>
+            {gifActive && (
+              <>
+                <OverlayPopup
+                  /* eslint-disable-next-line react/jsx-no-bind */
+                  close={() => {
+                    setgifActive(false);
+                    textareaRef.current?.focus();
+                  }}
+                >
+                  <GifPicker
+                    /* eslint-disable-next-line react/jsx-no-bind */
+                    onGifClick={(gif) => setGif(gif.url)}
+                    theme="auto"
+                    tenorApiKey={tenorApiKey}
+                  />
+                </OverlayPopup>
+              </>
+            )}
           </div>
 
           <SubmitModeHint input={textareaRef} className="post-edit-hint" />
