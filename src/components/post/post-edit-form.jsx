@@ -3,10 +3,14 @@ import {
   faLock,
   faPaperclip,
   faUserFriends,
+  faSmile,
 } from '@fortawesome/free-solid-svg-icons';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector, useStore } from 'react-redux';
 import GifPicker from 'gif-picker-react';
+import data from '@emoji-mart/data';
+import Picker from '@emoji-mart/react';
+import { Portal } from 'react-portal';
 import { tenorApiKey } from '../../utils/tenor-api-key';
 import { Icon } from '../fontawesome-icons';
 import { SmartTextarea } from '../smart-textarea';
@@ -25,6 +29,7 @@ import { ButtonLink } from '../button-link';
 import { usePrivacyCheck } from '../feeds-selector/privacy-check';
 import { OverlayPopup } from '../overlay-popup';
 import { faGif } from '../fontawesome-custom-icons';
+import styles from '../overlay-popup.module.scss';
 import PostAttachments from './post-attachments';
 
 const selectMaxFilesCount = (serverInfo) => serverInfo.attachments.maxCountPerPost;
@@ -42,6 +47,7 @@ export function PostEditForm({ id, isDirect, recipients, createdBy, body, attach
   const [postText, setPostText] = useState(body);
   const [privacyWarning, setPrivacyWarning] = useState(null);
   const [gifActive, setgifActive] = useState(false);
+  const [emojiActive, setemojiActive] = useState(false);
 
   const textareaRef = useRef();
 
@@ -49,6 +55,11 @@ export function PostEditForm({ id, isDirect, recipients, createdBy, body, attach
     textareaRef.current?.focus();
     setPostText(`${postText} ${gif}`);
     setgifActive(false);
+  };
+
+  const setEmoji = (emoji) => {
+    textareaRef.current?.focus();
+    setPostText(postText + emoji);
   };
 
   // Uploading files
@@ -239,6 +250,38 @@ export function PostEditForm({ id, isDirect, recipients, createdBy, body, attach
                     tenorApiKey={tenorApiKey}
                   />
                 </OverlayPopup>
+              </>
+            )}
+            {' | '}
+            <ButtonLink
+              className="post-edit-attachments"
+              role="button"
+              /* eslint-disable-next-line react/jsx-no-bind */
+              onClick={() => {
+                setemojiActive(!emojiActive);
+              }}
+            >
+              <Icon icon={faSmile} className="upload-icon" />
+            </ButtonLink>
+            {emojiActive && (
+              <>
+                <Portal>
+                  <div className={styles.popup}>
+                    <div className={styles.content}>
+                      <Picker
+                        autoFocus={true}
+                        /* eslint-disable-next-line react/jsx-no-bind */
+                        onClickOutside={() => {
+                          setemojiActive(false);
+                          textareaRef.current?.focus();
+                        }}
+                        data={data}
+                        /* eslint-disable-next-line react/jsx-no-bind */
+                        onEmojiSelect={(emoji) => setEmoji(emoji.native)}
+                      />
+                    </div>
+                  </div>
+                </Portal>
               </>
             )}
           </div>
