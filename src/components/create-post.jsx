@@ -3,11 +3,19 @@ import {
   faLock,
   faPaperclip,
   faUserFriends,
+  faSmile,
 } from '@fortawesome/free-solid-svg-icons';
+
 import { useCallback, useMemo, useRef, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import cn from 'classnames';
+import GifPicker from 'gif-picker-react';
+import data from '@emoji-mart/data';
+import Picker from '@emoji-mart/react';
+import { Portal } from 'react-portal';
 import { createPost, resetPostCreateForm } from '../redux/action-creators';
+import { tenorApiKey } from '../utils/tenor-api-key';
+import { faGif } from './fontawesome-custom-icons';
 import { ButtonLink } from './button-link';
 import ErrorBoundary from './error-boundary';
 import { Icon } from './fontawesome-icons';
@@ -26,6 +34,8 @@ import { Selector } from './feeds-selector/selector';
 import { CREATE_DIRECT, CREATE_REGULAR } from './feeds-selector/constants';
 import { CommaAndSeparated } from './separated';
 import { usePrivacyCheck } from './feeds-selector/privacy-check';
+import { OverlayPopup } from './overlay-popup';
+import styles from './overlay-popup.module.scss';
 
 const selectMaxFilesCount = (serverInfo) => serverInfo.attachments.maxCountPerPost;
 const selectMaxPostLength = (serverInfo) => serverInfo.maxTextLength.post;
@@ -44,6 +54,8 @@ export default function CreatePost({ sendTo, isDirects }) {
   const [isMoreOpen, toggleIsMoreOpen] = useBool(false);
   const [postText, setPostText] = useState(sendTo.invitation || '');
   const [selectorVisible, setSelectorVisible, expandSendTo] = useBool(isDirects);
+  const [gifActive, setgifActive] = useState(false);
+  const [emojiActive, setemojiActive] = useState(false);
 
   const defaultFeedNames = useMemo(() => {
     if (Array.isArray(sendTo.defaultFeed)) {
@@ -167,6 +179,17 @@ export default function CreatePost({ sendTo, isDirects }) {
     [privacyLevel],
   );
 
+  const setGif = (gif) => {
+    textareaRef.current?.focus();
+    setPostText(`${postText} ${gif}`);
+    setgifActive(false);
+  };
+
+  const setEmoji = (emoji) => {
+    textareaRef.current?.focus();
+    setPostText(postText + emoji);
+  };
+
   return (
     <div
       className="create-post post-editor"
@@ -228,6 +251,67 @@ export default function CreatePost({ sendTo, isDirects }) {
             >
               <Icon icon={faPaperclip} className="upload-icon" /> Add photos or files
             </ButtonLink>
+            {' | '}
+            <ButtonLink
+              className="post-edit-attachments"
+              role="button"
+              /* eslint-disable-next-line react/jsx-no-bind */
+              onClick={() => {
+                setgifActive(!gifActive);
+              }}
+            >
+              <Icon icon={faGif} className="upload-icon" />
+            </ButtonLink>
+            {gifActive && (
+              <>
+                <OverlayPopup
+                  /* eslint-disable-next-line react/jsx-no-bind */
+                  close={() => {
+                    setgifActive(false);
+                    textareaRef.current?.focus();
+                  }}
+                >
+                  <GifPicker
+                    /* eslint-disable-next-line react/jsx-no-bind */
+                    onGifClick={(gif) => setGif(gif.url)}
+                    theme="auto"
+                    tenorApiKey={tenorApiKey}
+                  />
+                </OverlayPopup>
+              </>
+            )}
+            {' | '}
+            <ButtonLink
+              className="post-edit-attachments"
+              role="button"
+              /* eslint-disable-next-line react/jsx-no-bind */
+              onClick={() => {
+                setemojiActive(!emojiActive);
+              }}
+            >
+              <Icon icon={faSmile} className="upload-icon" />
+            </ButtonLink>
+            {emojiActive && (
+              <>
+                <Portal>
+                  <div className={styles.popup}>
+                    <div className={styles.content}>
+                      <Picker
+                        autoFocus={true}
+                        /* eslint-disable-next-line react/jsx-no-bind */
+                        onClickOutside={() => {
+                          setemojiActive(false);
+                          textareaRef.current?.focus();
+                        }}
+                        data={data}
+                        /* eslint-disable-next-line react/jsx-no-bind */
+                        onEmojiSelect={(emoji) => setEmoji(emoji.native)}
+                      />
+                    </div>
+                  </div>
+                </Portal>
+              </>
+            )}
 
             <ButtonLink className="post-edit-more-trigger" onClick={toggleIsMoreOpen}>
               <MoreWithTriangle />
