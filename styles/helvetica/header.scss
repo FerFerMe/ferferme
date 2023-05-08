@@ -73,6 +73,8 @@
   width: 100%;
   z-index: 3;
   height: 50px;
+  transition: transform 0.3s ease-in-out;
+  transform: translateY(0%);
 
   .mobile-navbar-row {
     float: left;
