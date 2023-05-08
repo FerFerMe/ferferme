@@ -1,5 +1,5 @@
 /* global CONFIG */
-import { Component, Suspense } from 'react';
+import { Component, Suspense, createRef } from 'react';
 import { connect } from 'react-redux';
 import { Helmet } from 'react-helmet';
 import classnames from 'classnames';
@@ -63,6 +63,9 @@ class Layout extends Component {
 
     this.dragFirstLevel = false;
     this.dragSecondLevel = false;
+
+    this.prevScrollpos = 0;
+    this.mobileNavbarRef = createRef();
   }
 
   containsFiles(e) {
@@ -144,6 +147,7 @@ class Layout extends Component {
     window.addEventListener('dragleave', this.handleDragLeave);
     window.addEventListener('dragover', this.handleDragOver);
     window.addEventListener('drop', this.handleDrop);
+    window.addEventListener('scroll', this.handleScroll);
 
     this.updateCurrentRoute();
   }
@@ -157,8 +161,26 @@ class Layout extends Component {
     window.removeEventListener('dragleave', this.handleDragLeave);
     window.removeEventListener('dragover', this.handleDragOver);
     window.removeEventListener('drop', this.handleDrop);
+    window.removeEventListener('scroll', this.handleScroll);
   }
 
+  handleScroll = () => {
+    if (this.props.authenticated) {
+      const currentScrollPos = window.scrollY;
+      const mobileNavbar = this.mobileNavbarRef.current;
+
+      if (
+        this.prevScrollpos > currentScrollPos ||
+        window.scrollY + window.innerHeight >= document.documentElement.scrollHeight
+      ) {
+        mobileNavbar.style.transform = 'translateY(0)';
+      } else {
+        mobileNavbar.style.transform = 'translateY(100%)';
+      }
+
+      this.prevScrollpos = currentScrollPos;
+    }
+  };
   render() {
     const { props } = this;
 
@@ -179,7 +201,11 @@ class Layout extends Component {
 
           {props.authenticated && (
             <div className="row">
-              <div className="mobile-navbar hidden-md hidden-lg" role="navigation">
+              <div
+                className="mobile-navbar hidden-md hidden-lg"
+                role="navigation"
+                ref={this.mobileNavbarRef}
+              >
                 <div className="mobile-navbar-row">
                   <Link to={`/`}>
                     <Icon icon={faHouse} />
