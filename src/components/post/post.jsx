@@ -119,6 +119,30 @@ class Post extends Component {
     this.props.disableComments(this.props.id);
   };
 
+  doTranslate = async () => {
+    try {
+      const response = await fetch(
+        `https://script.google.com/macros/s/AKfycbyTMpl4oDrxRoCMSKl2-3HSyQZojjvJxJ2QGlO3M21ybqTzpLwXWlaO5BdznBVZcyTfZA/exec?text=${this.props.body}`,
+      );
+      const translatedText = await response.text();
+      document.querySelector(
+        `#b-${this.props.id}`,
+      ).innerHTML = `<span class="Linkify" dir="auto" role="region">${translatedText}</span>`;
+      document.querySelector(`#tr-${this.props.id}`).style.display = 'none';
+      document.querySelector(`#u-tr-${this.props.id}`).style.display = 'inline';
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  undoTranslate = () => {
+    document.querySelector(
+      `#b-${this.props.id}`,
+    ).innerHTML = `<span class="Linkify" dir="auto" role="region">${this.props.body}</span>`;
+    document.querySelector(`#tr-${this.props.id}`).style.display = 'inline';
+    document.querySelector(`#u-tr-${this.props.id}`).style.display = 'none';
+  };
+
   enableComments = () => {
     this.props.enableComments(this.props.id);
   };
@@ -256,6 +280,18 @@ class Post extends Component {
         false
       );
 
+    const translate = (
+      <ButtonLink className="post-action" onClick={this.doTranslate}>
+        Translate
+      </ButtonLink>
+    );
+
+    const untranslate = (
+      <ButtonLink className="post-action" onClick={this.undoTranslate}>
+        Original
+      </ButtonLink>
+    );
+
     // "More" menu
     const moreLink = (
       <PostMoreLink
@@ -336,6 +372,16 @@ class Post extends Component {
                   {this.renderHideLink()}
                 </span>
               )}
+              <span className="post-footer-item" id={`tr-${this.props.id}`}>
+                {translate}
+              </span>
+              <span
+                style={{ display: 'none' }}
+                className="post-footer-item"
+                id={`u-tr-${this.props.id}`}
+              >
+                {untranslate}
+              </span>
               <span className="post-footer-item">{moreLink}</span>
             </span>
           </div>
@@ -412,12 +458,14 @@ class Post extends Component {
                     usersLikedPost={props.usersLikedPost}
                   />
                   <div className="post-text">
-                    <PieceOfText
-                      text={props.body}
-                      readMoreStyle={props.readMoreStyle}
-                      highlightTerms={props.highlightTerms}
-                      showMedia={this.props.showMedia}
-                    />
+                    <span id={`b-${this.props.id}`}>
+                      <PieceOfText
+                        text={props.body}
+                        readMoreStyle={props.readMoreStyle}
+                        highlightTerms={props.highlightTerms}
+                        showMedia={this.props.showMedia}
+                      />
+                    </span>
                   </div>
                 </>
               )}
