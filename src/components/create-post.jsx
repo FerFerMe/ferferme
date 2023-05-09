@@ -40,7 +40,7 @@ import styles from './overlay-popup.module.scss';
 const selectMaxFilesCount = (serverInfo) => serverInfo.attachments.maxCountPerPost;
 const selectMaxPostLength = (serverInfo) => serverInfo.maxTextLength.post;
 
-export default function CreatePost({ sendTo, isDirects }) {
+export default function CreatePost({ sendTo, isDirects, hideNewPostDialog }) {
   const dispatch = useDispatch();
   const createPostStatus = useSelector((state) => state.createPostStatus);
 
@@ -117,8 +117,9 @@ export default function CreatePost({ sendTo, isDirects }) {
     (e) => {
       e?.preventDefault?.();
       canSubmitForm && dispatch(createPost(feeds, postText, fileIds, { commentsDisabled }));
+      hideNewPostDialog && hideNewPostDialog(false);
     },
-    [fileIds, canSubmitForm, commentsDisabled, dispatch, feeds, postText],
+    [fileIds, canSubmitForm, commentsDisabled, dispatch, feeds, postText, hideNewPostDialog],
   );
 
   const handleCommentsDisable = useCallback(

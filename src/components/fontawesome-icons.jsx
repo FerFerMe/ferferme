@@ -11,8 +11,7 @@ import {
   faUser,
 } from '@fortawesome/free-solid-svg-icons';
 import { faComment, faHeart as faHeartO, faImage } from '@fortawesome/free-regular-svg-icons';
-import { faCommentPlus } from './fontawesome-custom-icons';
-
+import { faCommentPlus, faPenToSquare } from './fontawesome-custom-icons';
 // These icons will be embedded to the page just once
 // (in <SVGSymbolDeclarations> element) and will be linked
 // via SVG <use> tag. Use it for the icons that may have
@@ -30,6 +29,7 @@ const preloadedIcons = [
   faSmile,
   faBell,
   faUser,
+  faPenToSquare,
 ];
 
 export const SVGSymbolDeclarations = memo(function SVGSymbolDeclarations() {

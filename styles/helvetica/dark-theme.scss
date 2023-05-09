@@ -434,6 +434,11 @@ body,
   .mobile-navbar {
     background-color: #202020;
 
+    .new-post-button {
+      color: #202020;
+      background-color: $link-color-dim;
+    }
+
     a:link {
       color: $link-color-dim;
     }
@@ -445,5 +450,11 @@ body,
     a:hover {
       color: $link-color-dim;
     }
+  }
+
+  .new-post {
+    background-color: hsl(220deg, 6%, 20%);
+    color: $link-color-dim;
+    box-shadow: 0 4px 6px rgba(114, 114, 114, 0.2);
   }
 }
