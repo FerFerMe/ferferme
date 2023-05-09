@@ -76,6 +76,44 @@
   transition: transform 0.3s ease-in-out;
   transform: translateY(0%);
 
+  .new-post-button {
+    position: fixed;
+    bottom: 60px;
+    right: 5%;
+    background-color: #54a5f0;
+    color: #edf1f5;
+    font-size: 18px;
+    padding: 10px 15px;
+    border-radius: 50px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+  }
+
+  .new-post {
+    box-sizing: border-box;
+    width: 90%;
+    position: fixed;
+    bottom: 120px;
+    z-index: 4;
+    right: 5%;
+    background-color: #edf1f5;
+    padding: 10px 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+
+    .create-post {
+      border-bottom: 0;
+      padding-bottom: 0;
+      margin-bottom: 0;
+      padding-top: 10px;
+
+      .post-textarea {
+        border-radius: 5px;
+      }
+    }
+  }
+
   .mobile-navbar-row {
     float: left;
     width: 25%;
