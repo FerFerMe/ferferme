@@ -8,7 +8,7 @@ import { Link } from 'react-router';
 
 import { signOut, home, setCurrentRoute } from '../redux/action-creators';
 import { getCurrentRouteName } from '../utils';
-import { faMessage, faHouse } from './fontawesome-custom-icons';
+import { faMessage, faHouse, faPenToSquare } from './fontawesome-custom-icons';
 import Footer from './footer';
 import Sidebar from './sidebar';
 import LoaderContainer from './loader-container';
@@ -21,6 +21,7 @@ import { Delayed } from './lazy-component';
 import { AppUpdated } from './app-updated';
 import { LayoutHeader } from './layout-header';
 import { UIScaleSetter } from './ui-scale-setter';
+import CreatePost from './create-post';
 
 const loadingPageMessage = (
   <Delayed>
@@ -66,6 +67,10 @@ class Layout extends Component {
 
     this.prevScrollpos = 0;
     this.mobileNavbarRef = createRef();
+    this.state = {
+      newPost: false,
+      pstDialog: false,
+    };
   }
 
   containsFiles(e) {
@@ -148,8 +153,10 @@ class Layout extends Component {
     window.addEventListener('dragover', this.handleDragOver);
     window.addEventListener('drop', this.handleDrop);
     window.addEventListener('scroll', this.handleScroll);
+    document.addEventListener('mousedown', this.handleClick);
 
     this.updateCurrentRoute();
+    //this.handleLanguage('Hi');
   }
 
   componentDidUpdate() {
@@ -162,6 +169,7 @@ class Layout extends Component {
     window.removeEventListener('dragover', this.handleDragOver);
     window.removeEventListener('drop', this.handleDrop);
     window.removeEventListener('scroll', this.handleScroll);
+    document.removeEventListener('mousedown', this.handleClick);
   }
 
   handleScroll = () => {
@@ -177,13 +185,26 @@ class Layout extends Component {
       this.prevScrollpos = currentScrollPos;
     }
   };
+
+  handleHideNewPostDialog = (bool) => {
+    this.setState({ newPost: bool });
+  };
+
+  handleClick = () => {
+    if (this.state.pstDialog) {
+      this.setState({ newPost: true });
+      this.setState({ pstDialog: false });
+    } else {
+      this.setState({ newPost: false });
+    }
+  };
+
   render() {
     const { props } = this;
 
     const layoutClassNames = classnames('container', { dragover: this.state.isDragOver });
 
     const shortFooter = !props.isAuthenticated && props.routeName === 'home';
-
     return (
       <ErrorBoundary>
         <AppUpdated />
@@ -202,6 +223,32 @@ class Layout extends Component {
                 role="navigation"
                 ref={this.mobileNavbarRef}
               >
+                <div
+                  className="new-post-button"
+                  /* eslint-disable-next-line react/jsx-no-bind */
+                  onMouseDown={() => {
+                    this.setState({ pstDialog: true });
+                  }}
+                >
+                  <Icon icon={faPenToSquare} />
+                </div>
+                {this.state.newPost && (
+                  <div
+                    className={'new-post'}
+                    /* eslint-disable-next-line react/jsx-no-bind */
+                    onMouseDown={() => this.setState({ pstDialog: true })}
+                  >
+                    <CreatePost
+                      hideNewPostDialog={this.handleHideNewPostDialog}
+                      sendTo={props.sendTo}
+                      user={props.user}
+                      createPost={props.createPost}
+                      resetPostCreateForm={props.resetPostCreateForm}
+                      addAttachmentResponse={props.addAttachmentResponse}
+                      showMedia={props.showMedia}
+                    />
+                  </div>
+                )}
                 <div className="mobile-navbar-row">
                   <Link to={`/`}>
                     <Icon icon={faHouse} />
@@ -261,12 +308,14 @@ class Layout extends Component {
 }
 
 function select(state, ownProps) {
+  const sendTo = { ...state.sendTo, defaultFeed: state.user.username };
   return {
     user: state.user,
     authenticated: state.authenticated,
     loadingView: state.routeLoadingState,
     routeName: getCurrentRouteName(ownProps),
     title: state.title,
+    sendTo,
   };
 }
 
