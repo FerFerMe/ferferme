@@ -1,13 +1,14 @@
 /* global CONFIG */
-import { Component, Suspense } from 'react';
+import { Component, Suspense, createRef } from 'react';
 import { connect } from 'react-redux';
 import { Helmet } from 'react-helmet';
 import classnames from 'classnames';
-import { faBug } from '@fortawesome/free-solid-svg-icons';
+import { faBug, faBell, faUser } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router';
 
 import { signOut, home, setCurrentRoute } from '../redux/action-creators';
 import { getCurrentRouteName } from '../utils';
+import { faMessage, faHouse, faPenToSquare } from './fontawesome-custom-icons';
 import Footer from './footer';
 import Sidebar from './sidebar';
 import LoaderContainer from './loader-container';
@@ -20,6 +21,7 @@ import { Delayed } from './lazy-component';
 import { AppUpdated } from './app-updated';
 import { LayoutHeader } from './layout-header';
 import { UIScaleSetter } from './ui-scale-setter';
+import CreatePost from './create-post';
 
 const loadingPageMessage = (
   <Delayed>
@@ -62,6 +64,13 @@ class Layout extends Component {
 
     this.dragFirstLevel = false;
     this.dragSecondLevel = false;
+
+    this.prevScrollpos = 0;
+    this.mobileNavbarRef = createRef();
+    this.state = {
+      newPost: false,
+      pstDialog: false,
+    };
   }
 
   containsFiles(e) {
@@ -143,8 +152,11 @@ class Layout extends Component {
     window.addEventListener('dragleave', this.handleDragLeave);
     window.addEventListener('dragover', this.handleDragOver);
     window.addEventListener('drop', this.handleDrop);
+    window.addEventListener('scroll', this.handleScroll);
+    document.addEventListener('mousedown', this.handleClick);
 
     this.updateCurrentRoute();
+    //this.handleLanguage('Hi');
   }
 
   componentDidUpdate() {
@@ -156,7 +168,36 @@ class Layout extends Component {
     window.removeEventListener('dragleave', this.handleDragLeave);
     window.removeEventListener('dragover', this.handleDragOver);
     window.removeEventListener('drop', this.handleDrop);
+    window.removeEventListener('scroll', this.handleScroll);
+    document.removeEventListener('mousedown', this.handleClick);
   }
+
+  handleScroll = () => {
+    if (this.props.authenticated) {
+      const currentScrollPos = window.scrollY;
+      const mobileNavbar = this.mobileNavbarRef.current;
+
+      if (this.prevScrollpos > currentScrollPos) {
+        mobileNavbar.style.transform = 'translateY(0)';
+      } else {
+        mobileNavbar.style.transform = 'translateY(100%)';
+      }
+      this.prevScrollpos = currentScrollPos;
+    }
+  };
+
+  handleHideNewPostDialog = (bool) => {
+    this.setState({ newPost: bool });
+  };
+
+  handleClick = () => {
+    if (this.state.pstDialog) {
+      this.setState({ newPost: true });
+      this.setState({ pstDialog: false });
+    } else {
+      this.setState({ newPost: false });
+    }
+  };
 
   render() {
     const { props } = this;
@@ -164,7 +205,6 @@ class Layout extends Component {
     const layoutClassNames = classnames('container', { dragover: this.state.isDragOver });
 
     const shortFooter = !props.isAuthenticated && props.routeName === 'home';
-
     return (
       <ErrorBoundary>
         <AppUpdated />
@@ -178,23 +218,65 @@ class Layout extends Component {
 
           {props.authenticated && (
             <div className="row">
-              <div className="mobile-shortcuts hidden-md hidden-lg" role="navigation">
-                <Link className="mobile-shortcut-link" to="/filter/discussions">
-                  Discussions
-                </Link>
-                <Link className="mobile-shortcut-link" to="/filter/notifications">
-                  Notifications
-                  {props.user.unreadNotificationsNumber > 0 &&
-                    !props.user.frontendPreferences.hideUnreadNotifications &&
-                    ` (${props.user.unreadNotificationsNumber})`}
-                </Link>
-                <Link className="mobile-shortcut-link" to="/filter/direct">
-                  Directs
-                  {props.user.unreadDirectsNumber > 0 && ` (${props.user.unreadDirectsNumber})`}
-                </Link>
-                <Link className="mobile-shortcut-link" to={`/${props.user.username}`}>
-                  My feed
-                </Link>
+              <div
+                className="mobile-navbar hidden-md hidden-lg"
+                role="navigation"
+                ref={this.mobileNavbarRef}
+              >
+                <div
+                  className="new-post-button"
+                  /* eslint-disable-next-line react/jsx-no-bind */
+                  onMouseDown={() => {
+                    this.setState({ pstDialog: true });
+                  }}
+                >
+                  <Icon icon={faPenToSquare} />
+                </div>
+                {this.state.newPost && (
+                  <div
+                    className={'new-post'}
+                    /* eslint-disable-next-line react/jsx-no-bind */
+                    onMouseDown={() => this.setState({ pstDialog: true })}
+                  >
+                    <CreatePost
+                      hideNewPostDialog={this.handleHideNewPostDialog}
+                      sendTo={props.sendTo}
+                      user={props.user}
+                      createPost={props.createPost}
+                      resetPostCreateForm={props.resetPostCreateForm}
+                      addAttachmentResponse={props.addAttachmentResponse}
+                      showMedia={props.showMedia}
+                    />
+                  </div>
+                )}
+                <div className="mobile-navbar-row">
+                  <Link to={`/`}>
+                    <Icon icon={faHouse} />
+                  </Link>
+                </div>
+                <div className="mobile-navbar-row">
+                  <Link to="/filter/notifications">
+                    <Icon icon={faBell} />
+                    <sup>
+                      {props.user.unreadNotificationsNumber > 0 &&
+                        !props.user.frontendPreferences.hideUnreadNotifications &&
+                        ` (${props.user.unreadNotificationsNumber})`}
+                    </sup>
+                  </Link>
+                </div>
+                <div className="mobile-navbar-row">
+                  <Link to="/filter/direct">
+                    <Icon icon={faMessage} />
+                    <sup>
+                      {props.user.unreadDirectsNumber > 0 && ` (${props.user.unreadDirectsNumber})`}
+                    </sup>
+                  </Link>
+                </div>
+                <div className="mobile-navbar-row">
+                  <Link to={`/${props.user.username}`}>
+                    <Icon icon={faUser} />
+                  </Link>
+                </div>
               </div>
             </div>
           )}
@@ -226,12 +308,14 @@ class Layout extends Component {
 }
 
 function select(state, ownProps) {
+  const sendTo = { ...state.sendTo, defaultFeed: state.user.username };
   return {
     user: state.user,
     authenticated: state.authenticated,
     loadingView: state.routeLoadingState,
     routeName: getCurrentRouteName(ownProps),
     title: state.title,
+    sendTo,
   };
 }
 

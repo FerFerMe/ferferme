@@ -1,9 +1,14 @@
 /* global CONFIG */
 import { useMemo, useCallback, useState, useRef, useEffect, useContext } from 'react';
 import cn from 'classnames';
+import GifPicker from 'gif-picker-react';
+import data from '@emoji-mart/data';
+import Picker from '@emoji-mart/react';
+import { Portal } from 'react-portal';
 
-import { faPaperclip } from '@fortawesome/free-solid-svg-icons';
+import { faPaperclip, faSmile } from '@fortawesome/free-solid-svg-icons';
 import { initialAsyncState } from '../redux/async-helpers';
+import { tenorApiKey } from '../utils/tenor-api-key';
 import { Throbber } from './throbber';
 import { PreventPageLeaving } from './prevent-page-leaving';
 import { ButtonLink } from './button-link';
@@ -14,6 +19,9 @@ import { SmartTextarea } from './smart-textarea';
 import { useUploader } from './uploader/uploader';
 import { useFileChooser } from './uploader/file-chooser';
 import { UploadProgress } from './uploader/progress';
+import { OverlayPopup } from './overlay-popup';
+import { faGif } from './fontawesome-custom-icons';
+import styles from './overlay-popup.module.scss';
 
 export function CommentEditForm({
   initialText = '',
@@ -28,6 +36,9 @@ export function CommentEditForm({
   const { setInput } = useContext(PostContext);
   const input = useRef(null);
   const [text, setText] = useState(initialText);
+  const [gifActive, setgifActive] = useState(false);
+  const [emojiActive, setemojiActive] = useState(false);
+
   const canSubmit = useMemo(
     () => !submitStatus.loading && text.trim() !== '',
     [submitStatus.loading, text],
@@ -76,6 +87,16 @@ export function CommentEditForm({
   const chooseFiles = useFileChooser(uploadFile, { multiple: true });
 
   const disabled = !canSubmit || submitStatus.loading || isUploading;
+
+  function setGif(gif) {
+    input.current?.focus();
+    setText(`${text} ${gif}`);
+    setgifActive(false);
+  }
+
+  function setEmoji(emoji) {
+    setText(`${text}${emoji}`);
+  }
 
   return (
     <div className="comment-body" role="form">
@@ -135,7 +156,71 @@ export function CommentEditForm({
         >
           <Icon icon={faPaperclip} />
         </ButtonLink>
-
+        <ButtonLink
+          className="comment-file-button iconic-button"
+          title="Add Gif"
+          /* eslint-disable-next-line react/jsx-no-bind */
+          onClick={() => {
+            setgifActive(!gifActive);
+            input.current?.focus();
+          }}
+        >
+          <Icon icon={faGif} />
+        </ButtonLink>
+        {gifActive && (
+          <>
+            <OverlayPopup
+              /* eslint-disable-next-line react/jsx-no-bind */
+              close={() => {
+                setgifActive(false);
+                input.current?.focus();
+              }}
+            >
+              <GifPicker
+                /* eslint-disable-next-line react/jsx-no-bind */
+                onGifClick={(gif) => setGif(gif.url)}
+                theme={
+                  localStorage.getItem(window.CONFIG.appearance.colorSchemeStorageKey) || 'auto'
+                }
+                tenorApiKey={tenorApiKey}
+              />
+            </OverlayPopup>
+          </>
+        )}
+        <ButtonLink
+          className="comment-file-button iconic-button"
+          title="Add Emoji"
+          /* eslint-disable-next-line react/jsx-no-bind */
+          onClick={() => {
+            setemojiActive(!emojiActive);
+          }}
+        >
+          <Icon icon={faSmile} />
+        </ButtonLink>
+        {emojiActive && (
+          <>
+            <Portal>
+              <div className={styles.popup}>
+                <div className={styles.content}>
+                  <Picker
+                    autoFocus={true}
+                    theme={
+                      localStorage.getItem(window.CONFIG.appearance.colorSchemeStorageKey) || 'auto'
+                    }
+                    /* eslint-disable-next-line react/jsx-no-bind */
+                    onClickOutside={() => {
+                      setemojiActive(false);
+                      input.current?.focus();
+                    }}
+                    data={data}
+                    /* eslint-disable-next-line react/jsx-no-bind */
+                    onEmojiSelect={(emoji) => setEmoji(emoji.native)}
+                  />
+                </div>
+              </div>
+            </Portal>
+          </>
+        )}
         {submitStatus.loading && <Throbber className="comment-throbber" />}
         {submitStatus.error && <span className="comment-error">{submitStatus.errorText}</span>}
       </div>
