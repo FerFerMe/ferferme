@@ -279,6 +279,12 @@
     color: #fff;
   }
 }
+
+.disabled {
+  pointer-events: none;
+  opacity: 0.5; /* optional */
+}
+
 @keyframes highlight {
   from {
     background-color: inherit;

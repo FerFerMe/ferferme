@@ -247,6 +247,7 @@ const SideBarAppearance = connect(
     e.target.classList.add('theme-selected');
     onChange({ target: { value: e.target.getAttribute('value') } });
   }
+
   useEffect(() => {
     const themeBox = document.querySelector('#theme-box');
     const children = themeBox.querySelectorAll('.theme-row');
@@ -265,8 +266,12 @@ const SideBarAppearance = connect(
       <div value={SCHEME_LIGHT} className="theme-row" onClick={handleRowClick}>
         Light
       </div>
-      {/* eslint-disable-next-line react/jsx-no-bind */}
-      <div value={SCHEME_SYSTEM} className="theme-row" onClick={handleRowClick}>
+      <div
+        value={SCHEME_SYSTEM}
+        className={`theme-row ${!systemColorSchemeSupported && 'disabled'}`}
+        /* eslint-disable-next-line react/jsx-no-bind */
+        onClick={handleRowClick}
+      >
         Auto
       </div>
       {/* eslint-disable-next-line react/jsx-no-bind */}
