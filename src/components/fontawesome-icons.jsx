@@ -17,7 +17,6 @@ import { faCommentPlus, faPenToSquare } from './fontawesome-custom-icons';
 // via SVG <use> tag. Use it for the icons that may have
 // many instances on the single page.
 const preloadedIcons = [
-  faComment,
   faHeart,
   faHeartO,
   faCommentPlus,
