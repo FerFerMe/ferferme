@@ -15,7 +15,6 @@ export const faPenToSquare = {
   ],
 };
 
-=======
 export const faGif = {
   iconName: 'Gif',
   prefix: 'fas',
