@@ -66,6 +66,14 @@ const defaultProps = {
  * - use onText attribute to handle updated text (it is necessary for insertText
  *   updates, which doesn't trigger onChange)
  */
+
+const getUniqueUsernames = (subscribers, subscriptions) => {
+  const subscribersUsername = (subscribers?.payload || []).map((e) => e.username);
+  const subscriptionsUsername = (subscriptions?.payload || []).map((e) => e.username);
+
+  return Array.from(new Set(subscribersUsername.concat(subscriptionsUsername))).sort();
+};
+
 export const SmartTextarea = forwardRef(function SmartTextarea(
   {
     // Triggers on submit by Enter of Ctrl/Cmd+Enter (no args)
@@ -103,22 +111,17 @@ export const SmartTextarea = forwardRef(function SmartTextarea(
   const dispatch = useDispatch();
   const authenticated = useSelector((state) => state.authenticated);
   const thisUsername = useSelector((state) => state.user.username || null);
-  //const submitMode = useSelector((state) => state.submitMode);
-
-  useEffect(
-    () =>
-      void (
-        authenticated &&
-        (dispatch(subscriptions(thisUsername)), dispatch(subscribers(thisUsername)))
-      ),
-    [authenticated, dispatch, thisUsername],
-  );
-
   const allSubscribers = useSelector((state) => state.usernameSubscribers);
   const allSubscriptions = useSelector((state) => state.usernameSubscriptions);
-  const subscribersUsername = (allSubscribers?.payload || []).map((e) => e.username);
-  const subscriptionsUsername = (allSubscriptions?.payload || []).map((e) => e.username);
-  const usersNames = [...new Set(subscribersUsername.concat(subscriptionsUsername))].sort();
+
+  useEffect(() => {
+    if (authenticated) {
+      dispatch(subscriptions(thisUsername));
+      dispatch(subscribers(thisUsername));
+    }
+  }, [authenticated, dispatch, thisUsername]);
+
+  const userNames = getUniqueUsernames(allSubscribers, allSubscriptions);
 
   useEffect(() => {
     window.addEventListener('resize', handleResize);
@@ -264,7 +267,7 @@ export const SmartTextarea = forwardRef(function SmartTextarea(
             str[i - 1] === spacer &&
             !spaceRemovers.includes(str[i - 2]) &&
             spaceRemovers.includes(str[i]) &&
-            getMatch(str.slice(0, Math.max(0, i - 2)), caret - 3, usersNames)
+            getMatch(str.slice(0, Math.max(0, i - 2)), caret - 3, userNames)
           ) {
             const newValue = `${str.slice(0, i - 1)}${str.slice(i, i + 1)}${str.slice(
               i - 1,
@@ -286,7 +289,7 @@ export const SmartTextarea = forwardRef(function SmartTextarea(
       enableSpaceRemovers = false;
     }
 
-    updateHelper(str, caret, usersNames);
+    updateHelper(str, caret, userNames);
     onChange?.(e);
     onText?.(e.target.value);
     //return onText(e.target.value);
