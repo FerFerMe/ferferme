@@ -5,6 +5,8 @@ import { Provider, useSelector } from 'react-redux';
 import { syncHistoryWithStore } from 'react-router-redux';
 import * as Sentry from '@sentry/react';
 import 'focus-visible';
+// eslint-disable-next-line import/no-named-as-default
+import GA4React from 'ga-4-react';
 
 import 'autotrack'; // used by google-analytics in ../index.jade
 
@@ -389,16 +391,24 @@ function App() {
     </Router>
   );
 }
+const ga4react = new GA4React('G-7SVCPRV62H');
 
-ReactDOM.render(
-  <Provider store={store}>
-    <DialogProvider>
-      <App />
-    </DialogProvider>
-  </Provider>,
-  document.querySelector('#app'),
-);
-
+(async () => {
+  await ga4react
+    .initialize()
+    .then(() => console.log('Analytics Success.'))
+    .catch(() => console.log('Analytics Failure.'))
+    .finally(() => {
+      ReactDOM.render(
+        <Provider store={store}>
+          <DialogProvider>
+            <App />
+          </DialogProvider>
+        </Provider>,
+        document.querySelector('#app'),
+      );
+    });
+})();
 function checkPath(Component, checker) {
   return (props) => {
     return checker(props) ? <Component {...props} /> : <NotFound {...props} />;
