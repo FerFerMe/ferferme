@@ -10,6 +10,7 @@ import {
   faHeartBroken,
   faLink,
   faUserFriends,
+  faLanguage,
 } from '@fortawesome/free-solid-svg-icons';
 import { faHeart, faClock, faTrashAlt } from '@fortawesome/free-regular-svg-icons';
 
@@ -25,6 +26,7 @@ import styles from '../dropdown-menu.module.scss';
 export const PostCommentMoreMenu = forwardRef(function PostCommentMore(
   {
     id,
+    body,
     authorUsername,
     doEdit,
     doDelete,
@@ -40,6 +42,9 @@ export const PostCommentMoreMenu = forwardRef(function PostCommentMore(
     doAndClose,
     likesCount,
     fixed = false,
+    doTranslate,
+    undoTranslate,
+    isTranslatable,
   },
   menuRef,
 ) {
@@ -111,6 +116,24 @@ export const PostCommentMoreMenu = forwardRef(function PostCommentMore(
         <div key="delete" className={styles.item}>
           <ButtonLink onClick={doDelete} className={styles.link}>
             <Iconic icon={faTrashAlt}>Delete this comment</Iconic>
+          </ButtonLink>
+        </div>
+      ),
+    ],
+    [
+      isTranslatable && body !== '' && (
+        <div className={styles.item} key="do-translate">
+          <ButtonLink onClick={doAndClose(doTranslate)} className={styles.link}>
+            <Iconic icon={faLanguage}>Translate</Iconic>
+          </ButtonLink>
+        </div>
+      ),
+    ],
+    [
+      !isTranslatable && body !== '' && (
+        <div className={styles.item} key="undo-translate">
+          <ButtonLink onClick={doAndClose(undoTranslate)} className={styles.link}>
+            <Iconic icon={faLanguage}>Original</Iconic>
           </ButtonLink>
         </div>
       ),

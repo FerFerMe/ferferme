@@ -1,5 +1,5 @@
 /* global CONFIG */
-import { Component } from 'react';
+import { Component, createRef } from 'react';
 import { Link } from 'react-router';
 import classnames from 'classnames';
 import { connect } from 'react-redux';
@@ -27,6 +27,7 @@ import { PostCommentPreview } from './post-comment-preview';
 
 class PostComment extends Component {
   commentContainer;
+  commentRef = createRef();
 
   state = {
     moreMenuOpened: false,
@@ -115,30 +116,6 @@ class PostComment extends Component {
       this.props.arrowsHighlightHandlers.hover(this.props.id, arrows);
     },
     leave: () => this.props.arrowsHighlightHandlers.leave(),
-  };
-
-  doTranslate = async () => {
-    try {
-      const response = await fetch(
-        `https://script.google.com/macros/s/AKfycbyTMpl4oDrxRoCMSKl2-3HSyQZojjvJxJ2QGlO3M21ybqTzpLwXWlaO5BdznBVZcyTfZA/exec?text=${this.props.body}`,
-      );
-      const translatedText = await response.text();
-      document.querySelector(
-        `#b-${this.props.id}`,
-      ).innerHTML = `<span class="Linkify" dir="auto" role="region">${translatedText}</span>`;
-      document.querySelector(`#tr-${this.props.id}`).style.display = 'none';
-      document.querySelector(`#u-tr-${this.props.id}`).style.display = 'inline';
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  undoTranslate = () => {
-    document.querySelector(
-      `#b-${this.props.id}`,
-    ).innerHTML = `<span class="Linkify" dir="auto" role="region">${this.props.body}</span>`;
-    document.querySelector(`#tr-${this.props.id}`).style.display = 'inline';
-    document.querySelector(`#u-tr-${this.props.id}`).style.display = 'none';
   };
 
   like = () => this.props.likeComment(this.props.id);
@@ -235,18 +212,9 @@ class PostComment extends Component {
                   </ButtonLink>
                 </span>
               )}
-              <span className="comment-tail__action" id={`tr-${this.props.id}`}>
-                <ButtonLink onClick={this.doTranslate}>Translate</ButtonLink>
-              </span>
-              <span
-                style={{ display: 'none' }}
-                className="comment-tail__action"
-                id={`u-tr-${this.props.id}`}
-              >
-                <ButtonLink onClick={this.undoTranslate}>Original</ButtonLink>
-              </span>
               <span className="comment-tail__action">
                 <PostCommentMore
+                  translateRef={this.commentRef}
                   className="comment-tail__action-link comment-tail__action-link--more"
                   id={this.props.id}
                   authorUsername={this.props.user?.username}
@@ -323,7 +291,7 @@ class PostComment extends Component {
           bonusInfo={commentTail}
           config={commentReadmoreConfig}
         >
-          <span id={`b-${this.props.id}`}>
+          <span ref={this.commentRef}>
             <PieceOfText
               text={this.props.body}
               readMoreStyle={this.props.readMoreStyle}
