@@ -16,13 +16,15 @@
   z-index: 20001;
   width: $sz;
   height: $sz;
-  margin-top: 30px;
+  margin-top: 30.5px;
   background-color: #edf1f5;
   transform: translate(-50%, -50%) rotate(45deg);
-  box-shadow: -7px -5px 9px -1px rgba(0, 0, 0, 0.25);
+  border-left: #14b1ec solid 2px;
+  border-top: #14b1ec solid 2px;
 
   :global(.dark-theme) & {
     background-color: $bg-color-lightest;
+    border-color: $accent-color;
   }
 }
 
@@ -30,11 +32,12 @@
   position: absolute;
   border-radius: 0.5rem;
   text-align: center;
-  box-shadow: 0 3px 9px 2px rgba(0, 0, 0, 0.25);
+  border: #14b1ec solid 2px;
   background-color: #edf1f5;
 
   :global(.dark-theme) & {
     background-color: $bg-color-lightest;
+    border-color: $accent-color;
   }
 }
 
@@ -51,10 +54,10 @@
 
 .mentionItemsbody::-webkit-scrollbar-track {
   border-radius: 10px;
-  background-color: #d9edf7;
+  background-color: #14b1ec;
 
   :global(.dark-theme) & {
-    background-color: mix(hsl(0deg, 0, 70%), hsl(40deg, 100%, 55%), 75%);
+    background-color: $accent-color;
   }
 }
 
@@ -65,10 +68,10 @@
 
 .mentionItemsbody::-webkit-scrollbar-thumb {
   border-radius: 10px;
-  background-color: #54a5f0;
+  background-color: #14b1ec;
 
   :global(.dark-theme) & {
-    background-color: mix(hsl(220deg, 9%, 10%), hsl(40deg, 100%, 55%), 25%);
+    background-color: $accent-color;
   }
 }
 
@@ -90,11 +93,11 @@
   grid-gap: 10px;
   cursor: pointer;
   border-radius: 15px;
-  border: 2px solid #54a5f0;
+  border: 2px solid #14b1ec;
   background-color: #d9edf7;
 
   :global(.dark-theme) & {
     background-color: $bg-color-lighter;
-    border: 2px solid mix(hsl(220deg, 9%, 10%), hsl(40deg, 100%, 55%), 70%);
+    border: 2px solid $accent-color;
   }
 }
