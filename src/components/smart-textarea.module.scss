@@ -19,12 +19,12 @@
   margin-top: 30.5px;
   background-color: #edf1f5;
   transform: translate(-50%, -50%) rotate(45deg);
-  border-left: #14b1ec solid 2px;
-  border-top: #14b1ec solid 2px;
+  border-left: #8ad1f8 solid 2px;
+  border-top: #8ad1f8 solid 2px;
 
   :global(.dark-theme) & {
     background-color: $bg-color-lightest;
-    border-color: $accent-color;
+    border-color: $link-color;
   }
 }
 
@@ -32,12 +32,12 @@
   position: absolute;
   border-radius: 0.5rem;
   text-align: center;
-  border: #14b1ec solid 2px;
+  border: #8ad1f8 solid 2px;
   background-color: #edf1f5;
 
   :global(.dark-theme) & {
     background-color: $bg-color-lightest;
-    border-color: $accent-color;
+    border-color: $link-color;
   }
 }
 
@@ -54,10 +54,10 @@
 
 .mentionItemsbody::-webkit-scrollbar-track {
   border-radius: 10px;
-  background-color: #14b1ec;
+  background-color: #8ad1f8;
 
   :global(.dark-theme) & {
-    background-color: $accent-color;
+    background-color: $link-color;
   }
 }
 
@@ -98,6 +98,6 @@
 
   :global(.dark-theme) & {
     background-color: $bg-color-lighter;
-    border: 2px solid $accent-color;
+    border-color: $accent-color;
   }
 }
