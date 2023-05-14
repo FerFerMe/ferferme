@@ -1,6 +1,6 @@
 import cn from 'classnames';
 import { CODE_ENTER, CODE_TAB, CODE_ESCAPE, CODE_UP, CODE_DOWN } from 'keycode-js';
-import { forwardRef, useCallback, useEffect, useState } from 'react';
+import { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 
@@ -37,6 +37,7 @@ const propTypes = {
   spacer: PropTypes.string,
   trigger: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
   options: PropTypes.oneOfType([PropTypes.object, PropTypes.arrayOf(PropTypes.string)]),
+  enableSpaceRemovers: PropTypes.bool,
 };
 
 const defaultProps = {
@@ -54,6 +55,7 @@ const defaultProps = {
   spaceRemovers: [',', '.', '!', '?'],
   spacer: ' ',
   trigger: '@',
+  enableSpaceRemovers: false,
 };
 
 /**
@@ -76,12 +78,12 @@ const getUniqueUsernames = (subscribers, subscriptions) => {
 
 export const SmartTextarea = forwardRef(function SmartTextarea(
   {
-    // Triggers on submit by Enter of Ctrl/Cmd+Enter (no args)
+    // trigger on submit by Enter of Ctrl/Cmd+Enter (no args)
     onSubmit,
-    // Triggers on new file dropped or pasted (one arg, the passed File), can be
+    // trigger on new file dropped or pasted (one arg, the passed File), can be
     // triggered multiple times synchronously
     onFile,
-    // Triggers on text change (one arg, new text)
+    // trigger on text change (one arg, new text)
     onText,
     // Regular onChange handler
     onChange,
@@ -105,8 +107,7 @@ export const SmartTextarea = forwardRef(function SmartTextarea(
   const [matchLength, setMatchLength] = useState(0);
 
   const [options, setOptions] = useState([]);
-  let recentValue = props.value;
-  let enableSpaceRemovers = false;
+  const recentValue = useRef('ref');
 
   const dispatch = useDispatch();
   const authenticated = useSelector((state) => state.authenticated);
@@ -131,169 +132,122 @@ export const SmartTextarea = forwardRef(function SmartTextarea(
     };
   }, []);
 
-  const getMatch = (str, caret, providedOptions) => {
-    const { trigger, matchAny, regex } = defaultProps;
-    const re = new RegExp(regex);
+  const getMatch = useCallback(
+    (str, caret, providedOptions) => {
+      const { trigger, matchAny, regex } = defaultProps;
+      const re = new RegExp(regex);
+      const triggerLength = trigger.length;
+      let slugData = null;
 
-    let triggers = trigger;
-    if (!Array.isArray(triggers)) {
-      triggers = new Array(trigger);
-    }
-    triggers.sort();
-
-    const providedOptionsObject = providedOptions;
-    if (Array.isArray(providedOptions)) {
-      triggers.forEach((triggerStr) => {
-        providedOptionsObject[triggerStr] = providedOptions;
-      });
-    }
-
-    const triggersMatch = arrayTriggerMatch(triggers, re);
-    let slugData = null;
-
-    for (const { triggerStr, triggerMatch, triggerLength } of triggersMatch) {
       for (let i = caret - 1; i >= 0; --i) {
         const substr = str.slice(i, caret);
         const match = substr.match(re);
-        let matchStart = -1;
 
-        if (triggerLength > 0) {
-          const triggerIdx = triggerMatch ? i : i - triggerLength + 1;
-
-          if (triggerIdx < 0) {
-            break;
-          }
-
-          if (isTrigger(triggerStr, str, triggerIdx)) {
-            matchStart = triggerIdx + triggerLength;
-          }
-          if (!match && matchStart < 0) {
-            break;
-          }
-        } else {
-          if (match && i > 0) {
-            continue;
-          }
-          matchStart = i === 0 && match ? 0 : i + 1;
-
-          if (caret - matchStart === 0) {
-            break;
-          }
+        if (!match && !isTrigger(trigger, str, i)) {
+          break;
         }
 
-        if (matchStart >= 0) {
-          const triggerOptions = providedOptionsObject[triggerStr];
-          if (triggerOptions == null) {
+        if (isTrigger(trigger, str, i)) {
+          const triggerOptions = providedOptions;
+          if (!triggerOptions) {
             continue;
           }
 
-          const matchedSlug = str.slice(matchStart, caret);
+          const matchedSlug = str.slice(i + triggerLength, caret);
+          const options = triggerOptions.filter(
+            (slug) =>
+              slug.toLowerCase().includes(matchedSlug.toLowerCase()) &&
+              (matchAny || slug.toLowerCase().startsWith(matchedSlug.toLowerCase())),
+          );
 
-          const options = triggerOptions.filter((slug) => {
-            const idx = slug.toLowerCase().indexOf(matchedSlug.toLowerCase());
-            return idx !== -1 && (matchAny || idx === 0);
-          });
-
-          const currTrigger = triggerStr;
           const matchLength = matchedSlug.length;
-
-          if (slugData === null) {
-            slugData = {
-              trigger: currTrigger,
-              matchStart,
-              matchLength,
-              options,
-            };
-          } else {
-            slugData = {
-              ...slugData,
-              trigger: currTrigger,
-              matchStart,
-              matchLength,
-              options,
-            };
-          }
-        }
-      }
-    }
-
-    return slugData;
-  };
-  const arrayTriggerMatch = (triggers, re) => {
-    const triggersMatch = triggers.map((trigger) => ({
-      triggerStr: trigger,
-      triggerMatch: trigger.match(re),
-      triggerLength: trigger.length,
-    }));
-
-    return triggersMatch;
-  };
-
-  const isTrigger = (trigger, str, i) => {
-    if (!trigger || trigger.length === 0) {
-      return true;
-    }
-
-    if (str.slice(i, i + trigger.length) === trigger) {
-      return true;
-    }
-
-    return false;
-  };
-
-  const handleChange = (e) => {
-    const { spaceRemovers, spacer } = props;
-    const old = recentValue;
-    const str = e.target.value;
-    const caret = getInputSelection(e.target).end;
-
-    if (str.length === 0) {
-      setHelperVisible(false);
-    }
-
-    recentValue = str;
-
-    if (str.length === 0 || !caret) {
-      onChange?.(e);
-      onText?.(e.target.value);
-      return false;
-    }
-
-    if (enableSpaceRemovers && spaceRemovers.length > 0 && str.length > 2 && spacer.length > 0) {
-      for (let i = 0; i < Math.max(old.length, str.length); ++i) {
-        if (old[i] !== str[i]) {
-          if (
-            i >= 2 &&
-            str[i - 1] === spacer &&
-            !spaceRemovers.includes(str[i - 2]) &&
-            spaceRemovers.includes(str[i]) &&
-            getMatch(str.slice(0, Math.max(0, i - 2)), caret - 3, userNames)
-          ) {
-            const newValue = `${str.slice(0, i - 1)}${str.slice(i, i + 1)}${str.slice(
-              i - 1,
-              i,
-            )}${str.slice(i + 1)}`;
-
-            updateCaretPosition(i + 1);
-            ref.current.value = newValue;
-
-            onChange?.(newValue);
-            onText?.(newValue);
-            return false;
-          }
-
+          slugData = {
+            trigger,
+            matchStart: i + triggerLength,
+            matchLength,
+            options,
+          };
           break;
         }
       }
 
-      enableSpaceRemovers = false;
-    }
+      return slugData;
+    },
+    [isTrigger],
+  );
 
-    updateHelper(str, caret, userNames);
-    onChange?.(e);
-    onText?.(e.target.value);
-    //return onText(e.target.value);
-  };
+  const isTrigger = useCallback(
+    (trigger, str, i) => !trigger || str.slice(i, i + trigger.length) === trigger,
+    [],
+  );
+
+  const handleChange = useCallback(
+    (e) => {
+      const { spaceRemovers, spacer, enableSpaceRemovers } = props;
+      const old = recentValue.current;
+      const str = e.target.value;
+      const caret = getInputSelection(e.target).end;
+
+      if (str.length === 0) {
+        setHelperVisible(false);
+        return onChange?.(e), onText?.(e.target.value), false;
+      }
+
+      recentValue.current = str;
+
+      if (str.length === 0 || !caret) {
+        onChange?.(e);
+        onText?.(e.target.value);
+        return false;
+      }
+
+      if (enableSpaceRemovers && spaceRemovers.length > 0 && str.length > 2 && spacer.length > 0) {
+        for (const [i, char] of str.entries()) {
+          if (old[i] !== char) {
+            if (
+              i >= 2 &&
+              char === spacer &&
+              !spaceRemovers.includes(str[i - 2]) &&
+              spaceRemovers.includes(str[i]) &&
+              getMatch(str.slice(0, Math.max(0, i - 2)), caret - 3, userNames)
+            ) {
+              const newValue = `${str.slice(0, i - 1)}${char}${str.slice(i - 1, i)}${str.slice(
+                i + 1,
+              )}`;
+
+              updateCaretPosition(i + 1);
+              ref.current.value = newValue;
+
+              onChange?.(newValue);
+              onText?.(newValue);
+              return false;
+            }
+
+            break;
+          }
+        }
+
+        props.enableSpaceRemovers = false;
+      }
+
+      updateHelper(str, caret, userNames);
+      onChange?.(e);
+      onText?.(e.target.value);
+      return false;
+    },
+    [
+      props,
+      recentValue,
+      setHelperVisible,
+      updateCaretPosition,
+      ref,
+      updateHelper,
+      onText,
+      getMatch,
+      onChange,
+      userNames,
+    ],
+  );
 
   const handleKeyDown = useCallback(
     (event) => {
@@ -316,7 +270,7 @@ export const SmartTextarea = forwardRef(function SmartTextarea(
         }
       }
     },
-    [helperVisible, options, selection, handleSelection],
+    [helperVisible, options, selection, handleSelection, resetHelper],
   );
 
   const handleResize = () => {
@@ -324,39 +278,60 @@ export const SmartTextarea = forwardRef(function SmartTextarea(
   };
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const handleSelection = useCallback((idx) => {
-    const { spacer, onSelect, changeOnSelect, trigger } = props;
+  const handleSelection = useCallback(
+    (idx) => {
+      const { spacer, onSelect, changeOnSelect, trigger } = props;
 
-    const slug = options[idx];
-    const value = recentValue;
-    const part1 =
-      trigger.length === 0 ? '' : value.slice(0, Math.max(0, matchStart - trigger.length));
-    const part2 = value.slice(Math.max(0, matchStart + matchLength));
+      const slug = options[idx];
+      const value = recentValue.current;
+      const event = { target: ref.current };
+      const changedStr = changeOnSelect(trigger, slug);
 
-    const event = { target: ref.current };
-    const changedStr = changeOnSelect(trigger, slug);
+      event.target.value = `${value.slice(
+        0,
+        Math.max(0, matchStart - trigger.length),
+      )}${changedStr}${spacer}${value.slice(Math.max(0, matchStart + matchLength))}`;
+      handleChange(event);
+      onSelect?.(event.target.value);
 
-    event.target.value = `${part1}${changedStr}${spacer}${part2}`;
-    handleChange(event);
-    onSelect(event.target.value);
+      resetHelper();
 
-    resetHelper();
+      updateCaretPosition(
+        value.slice(0, Math.max(0, matchStart - trigger.length)).length + changedStr.length + 1,
+      );
+    },
+    [
+      handleChange,
+      resetHelper,
+      updateCaretPosition,
+      options,
+      recentValue,
+      matchStart,
+      matchLength,
+      ref,
+      props,
+    ],
+  );
 
-    updateCaretPosition(part1.length + changedStr.length + 1);
+  const updateCaretPosition = useCallback(
+    (caret) => {
+      setCaretPosition(ref.current, caret);
+    },
+    [ref],
+  );
 
-    enableSpaceRemovers = true;
-  });
+  const updateHelper = useCallback(
+    (str, caret, options) => {
+      const { minChars, onRequestOptions, requestOnlyIfNoOptions } = props;
+      const input = ref.current;
 
-  const updateCaretPosition = (caret) => {
-    setCaretPosition(ref.current, caret);
-  };
+      const slug = getMatch(str, caret, options);
 
-  const updateHelper = (str, caret, options) => {
-    const input = ref.current;
+      if (!slug || slug.options.length === 0) {
+        resetHelper();
+        return;
+      }
 
-    const slug = getMatch(str, caret, options);
-
-    if (slug) {
       const caretPos = getCaretCoordinates(input, caret);
       const rect = input.getBoundingClientRect();
 
@@ -366,58 +341,59 @@ export const SmartTextarea = forwardRef(function SmartTextarea(
         input.offsetLeft + rect.width - OPTION_LIST_MIN_WIDTH,
       );
       const corner = Math.min(caretPos.left + input.offsetLeft, input.offsetLeft + rect.width);
-      const { minChars, onRequestOptions, requestOnlyIfNoOptions } = props;
+
       if (
-        slug.matchLength >= minChars &&
-        (slug.options.length > 1 ||
-          (slug.options.length === 1 && slug.options[0].length !== slug.matchLength))
+        slug.matchLength < minChars ||
+        (slug.options.length === 1 && slug.options[0].length === slug.matchLength)
       ) {
-        setHelperVisible(true);
-        setTop(top);
-        setLeft(left);
-        setCorner(corner);
-        setMatchStart(slug.matchStart);
-        setMatchLength(slug.matchLength);
-        setOptions(slug.options);
-      } else {
-        if (!requestOnlyIfNoOptions || slug.options.length === 0) {
-          onRequestOptions(str.slice(slug.matchStart, slug.matchStart + slug.matchLength));
+        if (!requestOnlyIfNoOptions) {
+          onRequestOptions?.(str.slice(slug.matchStart, slug.matchStart + slug.matchLength));
         }
-
         resetHelper();
+        return;
       }
-    } else {
-      resetHelper();
-    }
-  };
 
-  const resetHelper = () => {
+      setHelperVisible(true);
+      setTop(top);
+      setLeft(left);
+      setCorner(corner);
+      setMatchStart(slug.matchStart);
+      setMatchLength(slug.matchLength);
+      setOptions(slug.options);
+    },
+    [
+      props,
+      ref,
+      resetHelper,
+      getMatch,
+      setHelperVisible,
+      setTop,
+      setLeft,
+      setCorner,
+      setMatchStart,
+      setMatchLength,
+      setOptions,
+    ],
+  );
+
+  const resetHelper = useCallback(() => {
     setHelperVisible(false);
     setSelection(0);
-  };
+  }, [setHelperVisible, setSelection]);
 
   const onBlur = () => {
     resetHelper();
   };
 
-  const renderAutocompleteList = () => {
-    if (!helperVisible) {
-      return null;
-    }
-
-    const maxOptions = options.length;
-    if (options.length === 0) {
-      return null;
-    }
-    if (selection >= options.length) {
-      setSelection(0);
-
-      return null;
-    }
-
-    const optionNumber = maxOptions === 0 ? options.length : maxOptions;
-
-    const helperOptions = options.slice(0, optionNumber).map((val, idx) => {
+  const HelperOptions = ({
+    options,
+    selection,
+    value,
+    matchStart,
+    matchLength,
+    handleSelection,
+  }) => {
+    return options.slice(0, options.length).map((val, idx) => {
       const highlightStart = val
         .toLowerCase()
         .indexOf(value.slice(matchStart, matchStart + matchLength).toLowerCase());
@@ -426,13 +402,13 @@ export const SmartTextarea = forwardRef(function SmartTextarea(
           className={idx === selection ? styles.activeMention : styles.mentionItemsbodycontent}
           key={val}
           /* eslint-disable-next-line react/jsx-no-bind */
-          onMouseDown={() => {
-            event.preventDefault();
+          onMouseDown={(event) => {
+            event.preventDefault?.();
             handleSelection(idx);
           }}
           /* eslint-disable-next-line react/jsx-no-bind */
-          onPointerEnter={() => {
-            event.preventDefault();
+          onPointerEnter={(event) => {
+            event.preventDefault?.();
             setSelection(idx);
           }}
         >
@@ -445,6 +421,17 @@ export const SmartTextarea = forwardRef(function SmartTextarea(
         </div>
       );
     });
+  };
+
+  const renderAutocompleteList = () => {
+    if (!helperVisible || options.length === 0) {
+      return null;
+    }
+
+    if (selection >= options.length) {
+      setSelection(0);
+      return null;
+    }
 
     return (
       <>
@@ -452,7 +439,14 @@ export const SmartTextarea = forwardRef(function SmartTextarea(
         <div className={styles.mentionContainer} style={{ left, top }}>
           <div className={styles.mentionItems}>
             <div id="mentionItemsbody" className={styles.mentionItemsbody}>
-              {helperOptions}
+              <HelperOptions
+                options={options}
+                selection={selection}
+                value={value}
+                matchStart={matchStart}
+                matchLength={matchLength}
+                handleSelection={handleSelection}
+              />
             </div>
           </div>
         </div>
@@ -515,6 +509,9 @@ export const SmartTextarea = forwardRef(function SmartTextarea(
     </>
   );
 });
+
+SmartTextarea.propTypes = propTypes;
+SmartTextarea.defaultProps = defaultProps;
 
 function useSubmit(onSubmit, ref) {
   const submitMode = useSelector((state) => state.submitMode);
@@ -662,5 +659,3 @@ function containsFiles(dndEvent) {
   }
   return false;
 }
-SmartTextarea.propTypes = propTypes;
-SmartTextarea.defaultProps = defaultProps;
