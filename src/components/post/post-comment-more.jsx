@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect } from 'react';
+import { memo, useCallback, useEffect, useState } from 'react';
 import { Portal } from 'react-portal';
 import { intentToScroll } from '../../services/unscroll';
 
@@ -9,6 +9,7 @@ import { useDropDownKbd } from '../hooks/drop-down-kbd';
 import { useMediaQuery } from '../hooks/media-query';
 import { MoreWithTriangle } from '../more-with-triangle';
 
+import { translate } from '../../utils/translator';
 import { PostCommentLikes } from './post-comment-likes';
 import { PostCommentMoreMenu } from './post-comment-more-menu';
 
@@ -25,10 +26,25 @@ export const PostCommentMore = memo(function PostCommentMore({
     closeOn: CLOSE_ON_CLICK_OUTSIDE,
     fixed: fixedMenu,
   });
-
+  //console.log(menuProps);
   const [likesOpened, , openLikes, closeLikes] = useBool(false);
+  const [translateText, setTranslateText] = useState(null);
+  const [isTranslatable, setIsTranslatable] = useState(true);
 
   const doAndClose = (h) => h && ((...args) => (h(...args), close()));
+
+  const doTranslate = useCallback(async () => {
+    setTranslateText(menuProps.translateRef.current.innerHTML);
+    menuProps.translateRef.current.innerText = await translate(
+      menuProps.translateRef.current.innerText,
+    );
+    setIsTranslatable(false);
+  }, [menuProps.translateRef, setTranslateText, setIsTranslatable]);
+
+  const undoTranslate = useCallback(() => {
+    menuProps.translateRef.current.innerHTML = translateText;
+    setIsTranslatable(true);
+  }, [setIsTranslatable, translateText, menuProps.translateRef]);
 
   const menuPropsWithClose = { doAndClose, doShowLikes: doAndClose(openLikes) };
   Object.keys(menuProps).forEach((key) => {
@@ -76,7 +92,15 @@ export const PostCommentMore = memo(function PostCommentMore({
       </ButtonLink>
       {opened && (
         <Portal>
-          <PostCommentMoreMenu {...menuPropsWithClose} id={id} ref={menuRef} fixed={fixedMenu} />
+          <PostCommentMoreMenu
+            doTranslate={doTranslate}
+            undoTranslate={undoTranslate}
+            isTranslatable={isTranslatable}
+            {...menuPropsWithClose}
+            id={id}
+            ref={menuRef}
+            fixed={fixedMenu}
+          />
         </Portal>
       )}
       {likesOpened && <PostCommentLikes id={id} close={doCloseLikes} />}
