@@ -1,5 +1,5 @@
 /* global CONFIG */
-import { Component } from 'react';
+import { Component, createRef } from 'react';
 import { Link } from 'react-router';
 import classnames from 'classnames';
 import { connect } from 'react-redux';
@@ -27,6 +27,7 @@ import { PostCommentPreview } from './post-comment-preview';
 
 class PostComment extends Component {
   commentContainer;
+  commentRef = createRef();
 
   state = {
     moreMenuOpened: false,
@@ -213,6 +214,7 @@ class PostComment extends Component {
               )}
               <span className="comment-tail__action">
                 <PostCommentMore
+                  translateRef={this.commentRef}
                   className="comment-tail__action-link comment-tail__action-link--more"
                   id={this.props.id}
                   authorUsername={this.props.user?.username}
@@ -289,15 +291,17 @@ class PostComment extends Component {
           bonusInfo={commentTail}
           config={commentReadmoreConfig}
         >
-          <PieceOfText
-            text={this.props.body}
-            readMoreStyle={this.props.readMoreStyle}
-            highlightTerms={this.props.highlightTerms}
-            userHover={this.props.authorHighlightHandlers}
-            arrowHover={this.arrowHoverHandlers}
-            arrowClick={this.arrowClick}
-            showMedia={this.props.showMedia}
-          />
+          <span ref={this.commentRef}>
+            <PieceOfText
+              text={this.props.body}
+              readMoreStyle={this.props.readMoreStyle}
+              highlightTerms={this.props.highlightTerms}
+              userHover={this.props.authorHighlightHandlers}
+              arrowHover={this.arrowHoverHandlers}
+              arrowClick={this.arrowClick}
+              showMedia={this.props.showMedia}
+            />
+          </span>
           {commentTail}
         </Expandable>
       </div>

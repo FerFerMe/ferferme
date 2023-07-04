@@ -8,6 +8,7 @@ import {
   faBookmark as faBookmarkSolid,
   faSignOutAlt,
   faAt,
+  faLanguage,
 } from '@fortawesome/free-solid-svg-icons';
 import {
   faClock,
@@ -15,18 +16,8 @@ import {
   faTrashAlt,
   faBookmark,
 } from '@fortawesome/free-regular-svg-icons';
+
 import { noop } from 'lodash-es';
-import { useDispatch } from 'react-redux';
-
-import { copyURL } from '../../utils/copy-url';
-import { leaveDirect } from '../../redux/action-creators';
-import { ButtonLink } from '../button-link';
-import { Throbber } from '../throbber';
-import { Icon } from '../fontawesome-icons';
-import TimeDisplay from '../time-display';
-
-import styles from '../dropdown-menu.module.scss';
-import { format } from '../../utils/date-format';
 
 // eslint-disable-next-line complexity
 export const PostMoreMenu = forwardRef(function PostMoreMenu(
@@ -34,6 +25,7 @@ export const PostMoreMenu = forwardRef(function PostMoreMenu(
     user,
     post: {
       id: postId,
+      body: body,
       isEditable = false,
       canBeRemovedFrom = [],
       isModeratable = false,
@@ -58,6 +50,9 @@ export const PostMoreMenu = forwardRef(function PostMoreMenu(
     toggleSave,
     fixed = false,
     doMention,
+    doTranslate,
+    undoTranslate,
+    isTranslatable,
   },
   ref,
 ) {
@@ -135,6 +130,24 @@ export const PostMoreMenu = forwardRef(function PostMoreMenu(
         </ButtonLink>
       </div>
     )),
+    [
+      isTranslatable && body !== '' && (
+        <div className={styles.item} key="do-translate">
+          <ButtonLink onClick={doAndClose(doTranslate)} className={styles.link}>
+            <Iconic icon={faLanguage}>Translate</Iconic>
+          </ButtonLink>
+        </div>
+      ),
+    ],
+    [
+      !isTranslatable && body !== '' && (
+        <div className={styles.item} key="undo-translate">
+          <ButtonLink onClick={doAndClose(undoTranslate)} className={styles.link}>
+            <Iconic icon={faLanguage}>Original</Iconic>
+          </ButtonLink>
+        </div>
+      ),
+    ],
     [
       amIAuthenticated && (
         <div className={styles.item} key="save-post">

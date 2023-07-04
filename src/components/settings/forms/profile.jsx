@@ -11,6 +11,9 @@ import { shouldBe, errorMessage, groupErrClass } from '../../form-utils';
 import { useServerInfo } from '../../hooks/server-info';
 import { EmailVerificationSubform } from '../../email-verification-subform';
 import styles from './forms.module.scss';
+import BirthdayPicker from './birthday-picker';
+
+const BD_RE = /🎂 (.*)/;
 
 export default function ProfileForm() {
   const dispatch = useDispatch();
@@ -35,6 +38,7 @@ export default function ProfileForm() {
   const email = useField('email', form.form);
   const emailCode = useField('emailCode', form.form);
   const description = useField('description', form.form);
+  const birthday = useField('birthday', form.form);
 
   return (
     <form onSubmit={form.handleSubmit}>
@@ -66,6 +70,16 @@ export default function ProfileForm() {
       </div>
 
       <EmailVerificationSubform emailField={email} codeField={emailCode} />
+
+      <div className={groupErrClass(birthday)}>
+        <label htmlFor="birthday-input">Birthday</label>
+        <BirthdayPicker
+          id="birthday-input"
+          userId={userData.id}
+          description={description.input.value}
+          birthday={birthday.input.value}
+        />
+      </div>
 
       <div className={groupErrClass(description)}>
         <label htmlFor="description-input">About you</label>
@@ -102,11 +116,17 @@ export default function ProfileForm() {
 }
 
 function initialValues(userData) {
+  let birthday = '';
+  const match = BD_RE.exec(userData.description);
+  if (match) {
+    birthday = match[1].split(' ');
+  }
   return {
     screenName: userData.screenName || '',
     email: userData.email || '',
     emailCode: '',
     description: userData.description || '',
+    birthday,
   };
 }
 
