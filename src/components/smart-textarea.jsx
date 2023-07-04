@@ -132,6 +132,11 @@ export const SmartTextarea = forwardRef(function SmartTextarea(
     };
   }, []);
 
+  const isTrigger = useCallback(
+    (trigger, str, i) => !trigger || str.slice(i, i + trigger.length) === trigger,
+    [],
+  );
+
   const getMatch = useCallback(
     (str, caret, providedOptions) => {
       const { trigger, matchAny, regex } = defaultProps;
@@ -176,11 +181,72 @@ export const SmartTextarea = forwardRef(function SmartTextarea(
     [isTrigger],
   );
 
-  const isTrigger = useCallback(
-    (trigger, str, i) => !trigger || str.slice(i, i + trigger.length) === trigger,
-    [],
+  const resetHelper = useCallback(() => {
+    setHelperVisible(false);
+    setSelection(0);
+  }, [setHelperVisible, setSelection]);
+  const updateCaretPosition = useCallback(
+    (caret) => {
+      setCaretPosition(ref.current, caret);
+    },
+    [ref],
   );
 
+  const updateHelper = useCallback(
+    (str, caret, options) => {
+      const { minChars, onRequestOptions, requestOnlyIfNoOptions } = props;
+      const input = ref.current;
+
+      const slug = getMatch(str, caret, options);
+
+      if (!slug || slug.options.length === 0) {
+        resetHelper();
+        return;
+      }
+
+      const caretPos = getCaretCoordinates(input, caret);
+      const rect = input.getBoundingClientRect();
+
+      const top = caretPos.top + input.offsetTop;
+      const left = Math.min(
+        caretPos.left + input.offsetLeft - OPTION_LIST_Y_OFFSET,
+        input.offsetLeft + rect.width - OPTION_LIST_MIN_WIDTH,
+      );
+      const corner = Math.min(caretPos.left + input.offsetLeft, input.offsetLeft + rect.width);
+
+      if (
+        slug.matchLength < minChars ||
+        (slug.options.length === 1 && slug.options[0].length === slug.matchLength)
+      ) {
+        if (!requestOnlyIfNoOptions) {
+          onRequestOptions?.(str.slice(slug.matchStart, slug.matchStart + slug.matchLength));
+        }
+        resetHelper();
+        return;
+      }
+
+      setHelperVisible(true);
+      setTop(top);
+      setLeft(left);
+      setCorner(corner);
+      setMatchStart(slug.matchStart);
+      setMatchLength(slug.matchLength);
+      setOptions(slug.options);
+    },
+    [
+      props,
+      ref,
+      resetHelper,
+      getMatch,
+      setHelperVisible,
+      setTop,
+      setLeft,
+      setCorner,
+      setMatchStart,
+      setMatchLength,
+      setOptions,
+    ],
+  );
   const handleChange = useCallback(
     (e) => {
       const { spaceRemovers, spacer, enableSpaceRemovers } = props;
@@ -249,35 +315,6 @@ export const SmartTextarea = forwardRef(function SmartTextarea(
     ],
   );
 
-  const handleKeyDown = useCallback(
-    (event) => {
-      if (helperVisible) {
-        const element = document.querySelector('#mentionItemsbody');
-        if (event.code === CODE_ESCAPE) {
-          event.preventDefault();
-          resetHelper();
-        } else if (event.code === CODE_TAB) {
-          event.preventDefault();
-          handleSelection(selection);
-        } else if (event.code === CODE_UP && selection >= 1) {
-          event.preventDefault();
-          setSelection(selection - 1);
-          element.scrollTop = (selection - 2) * 44;
-        } else if (event.code === CODE_DOWN && selection < options.length - 1) {
-          event.preventDefault();
-          setSelection(selection + 1);
-          element.scrollTop = selection * 44;
-        }
-      }
-    },
-    [helperVisible, options, selection, handleSelection, resetHelper],
-  );
-
-  const handleResize = () => {
-    setHelperVisible(false);
-  };
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleSelection = useCallback(
     (idx) => {
       const { spacer, onSelect, changeOnSelect, trigger } = props;
@@ -313,73 +350,35 @@ export const SmartTextarea = forwardRef(function SmartTextarea(
     ],
   );
 
-  const updateCaretPosition = useCallback(
-    (caret) => {
-      setCaretPosition(ref.current, caret);
-    },
-    [ref],
-  );
-
-  const updateHelper = useCallback(
-    (str, caret, options) => {
-      const { minChars, onRequestOptions, requestOnlyIfNoOptions } = props;
-      const input = ref.current;
-
-      const slug = getMatch(str, caret, options);
-
-      if (!slug || slug.options.length === 0) {
-        resetHelper();
-        return;
-      }
-
-      const caretPos = getCaretCoordinates(input, caret);
-      const rect = input.getBoundingClientRect();
-
-      const top = caretPos.top + input.offsetTop;
-      const left = Math.min(
-        caretPos.left + input.offsetLeft - OPTION_LIST_Y_OFFSET,
-        input.offsetLeft + rect.width - OPTION_LIST_MIN_WIDTH,
-      );
-      const corner = Math.min(caretPos.left + input.offsetLeft, input.offsetLeft + rect.width);
-
-      if (
-        slug.matchLength < minChars ||
-        (slug.options.length === 1 && slug.options[0].length === slug.matchLength)
-      ) {
-        if (!requestOnlyIfNoOptions) {
-          onRequestOptions?.(str.slice(slug.matchStart, slug.matchStart + slug.matchLength));
+  const handleKeyDown = useCallback(
+    (event) => {
+      if (helperVisible) {
+        const element = document.querySelector('#mentionItemsbody');
+        if (event.code === CODE_ESCAPE) {
+          event.preventDefault();
+          resetHelper();
+        } else if (event.code === CODE_TAB) {
+          event.preventDefault();
+          handleSelection(selection);
+        } else if (event.code === CODE_UP && selection >= 1) {
+          event.preventDefault();
+          setSelection(selection - 1);
+          element.scrollTop = (selection - 2) * 44;
+        } else if (event.code === CODE_DOWN && selection < options.length - 1) {
+          event.preventDefault();
+          setSelection(selection + 1);
+          element.scrollTop = selection * 44;
         }
-        resetHelper();
-        return;
       }
-
-      setHelperVisible(true);
-      setTop(top);
-      setLeft(left);
-      setCorner(corner);
-      setMatchStart(slug.matchStart);
-      setMatchLength(slug.matchLength);
-      setOptions(slug.options);
     },
-    [
-      props,
-      ref,
-      resetHelper,
-      getMatch,
-      setHelperVisible,
-      setTop,
-      setLeft,
-      setCorner,
-      setMatchStart,
-      setMatchLength,
-      setOptions,
-    ],
+    [helperVisible, options, selection, handleSelection, resetHelper],
   );
 
-  const resetHelper = useCallback(() => {
+  const handleResize = () => {
     setHelperVisible(false);
-    setSelection(0);
-  }, [setHelperVisible, setSelection]);
+  };
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
 
   const onBlur = () => {
     resetHelper();
