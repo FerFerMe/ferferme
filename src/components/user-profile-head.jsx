@@ -40,10 +40,21 @@ import PieceOfText from './piece-of-text';
 import { ButtonLink } from './button-link';
 import { useDropDown, BOTTOM_RIGHT, CLOSE_ON_CLICK_OUTSIDE } from './hooks/drop-down';
 import styles from './user-profile-head.module.scss';
-import { UserSubscriptionEditPopup } from './user-subscription-edit-popup';
 import { HomeFeedLink } from './home-feed-link';
 import { UserProfileHeadActions } from './user-profile-head-actions';
 import { UserProfileHeadStats } from './user-profile-head-stats';
+import { lazyComponent } from './lazy-component';
+
+const UserSubscriptionEditPopup = lazyComponent(
+  () =>
+    import('./user-subscription-edit-popup').then((m) => ({
+      default: m.UserSubscriptionEditPopup,
+    })),
+  {
+    fallback: 'Loading form...',
+    errorMessage: "Couldn't load form",
+  },
+);
 
 export const UserProfileHead = withRouter(
   withKey(({ router }) => router.params.userName)(function UserProfileHead({ router }) {
@@ -392,9 +403,11 @@ function InListsIndicator({
           ))}
         </>
       )}{' '}
+      (
       <ButtonLink ref={subscrFormPivotRef} onClick={subscrFormToggle}>
         edit
       </ButtonLink>
+      )
     </div>
   );
 }
