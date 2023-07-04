@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`ListEditor Renders a list and doesn't blow up 1`] = `
+exports[`ListEditor > Renders a list and doesn't blow up 1`] = `
 <section
   class="wrapper"
   data-testid="list-editor"
@@ -59,6 +59,7 @@ exports[`ListEditor Renders a list and doesn't blow up 1`] = `
       <input
         class="form-control input-sm filterInput"
         name="nameFilter"
+        role="searchbox"
         type="search"
         value=""
       />
@@ -297,7 +298,7 @@ exports[`ListEditor Renders a list and doesn't blow up 1`] = `
 </section>
 `;
 
-exports[`ListEditor Searches for users 1`] = `
+exports[`ListEditor > Searches for users 1`] = `
 <ul
   class="list"
 >
