@@ -145,14 +145,6 @@ export default {
 
   // if false, new users are public by default *
 
-  eslint: {
-    // By default the eslint-linebreak-style directive requires "windows" linebreaks
-    // on Windows platform and "unix" linebreaks otherwise.
-    // You can override this behavior by setting this parameter explicitly
-    // to "windows" or "unix".
-    linebreakStyle: null,
-  },
-
   appVersionCheck: {
     // Use real URL/URI here to enable update check
     url: '',
