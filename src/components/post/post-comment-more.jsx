@@ -40,25 +40,10 @@ export const PostCommentMore = memo(function PostCommentMore({
     closeOn: CLOSE_ON_CLICK_OUTSIDE,
     fixed: fixedMenu,
   });
-  //console.log(menuProps);
+
   const [likesOpened, , openLikes, closeLikes] = useBool(false);
-  const [translateText, setTranslateText] = useState(null);
-  const [isTranslatable, setIsTranslatable] = useState(true);
 
   const doAndClose = (h) => h && ((...args) => (h(...args), close()));
-
-  const doTranslate = useCallback(async () => {
-    setTranslateText(menuProps.translateRef.current.innerHTML);
-    menuProps.translateRef.current.innerText = await translate(
-      menuProps.translateRef.current.innerText,
-    );
-    setIsTranslatable(false);
-  }, [menuProps.translateRef, setTranslateText, setIsTranslatable]);
-
-  const undoTranslate = useCallback(() => {
-    menuProps.translateRef.current.innerHTML = translateText;
-    setIsTranslatable(true);
-  }, [setIsTranslatable, translateText, menuProps.translateRef]);
 
   const menuPropsWithClose = { doAndClose, doShowLikes: doAndClose(openLikes) };
   Object.keys(menuProps).forEach((key) => {

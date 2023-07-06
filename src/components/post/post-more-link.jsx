@@ -10,15 +10,12 @@ import { useMediaQuery } from '../hooks/media-query';
 import { MoreWithTriangle } from '../more-with-triangle';
 import { TimedMessage } from '../timed-message';
 import { ButtonLink } from '../button-link';
-import { translate } from '../../utils/translator';
 
 import { translate } from '../../utils/translator';
 import { PostMoreMenu } from './post-more-menu';
 
 export default function PostMoreLink({ post, user, ...props }) {
   const fixedMenu = useMediaQuery('(max-width: 450px)');
-  const [translateText, setTranslateText] = useState(null);
-  const [isTranslatable, setIsTranslatable] = useState(true);
 
   const { pivotRef, menuRef, opened, toggle, forceClose } = useDropDownKbd({
     closeOn: CLOSE_ON_CLICK_OUTSIDE,
@@ -49,17 +46,6 @@ export default function PostMoreLink({ post, user, ...props }) {
     (...feedNames) => confirmFirst(props.deletePost(...feedNames)),
     [props],
   );
-
-  const doTranslate = useCallback(async () => {
-    setTranslateText(props.translateRef.current.innerHTML);
-    props.translateRef.current.innerText = await translate(props.translateRef.current.innerText);
-    setIsTranslatable(false);
-  }, [props.translateRef, setTranslateText, setIsTranslatable]);
-
-  const undoTranslate = useCallback(() => {
-    props.translateRef.current.innerHTML = translateText;
-    setIsTranslatable(true);
-  }, [setIsTranslatable, translateText, props.translateRef]);
 
   const canonicalPostURI = canonicalURI(post);
 
@@ -111,9 +97,6 @@ export default function PostMoreLink({ post, user, ...props }) {
             ref={menuRef}
             post={post}
             user={user}
-            doTranslate={doTranslate}
-            undoTranslate={undoTranslate}
-            isTranslatable={isTranslatable}
             toggleEditingPost={props.toggleEditingPost}
             toggleModeratingComments={props.toggleModeratingComments}
             enableComments={props.enableComments}
