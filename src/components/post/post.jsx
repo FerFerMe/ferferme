@@ -47,6 +47,7 @@ class Post extends Component {
   selectFeeds;
   hideLink = createRef();
   textareaRef = createRef();
+  postRef = createRef();
 
   state = {
     forceAbsTimestamps: false,
@@ -261,6 +262,7 @@ class Post extends Component {
       <PostMoreLink
         user={props.user}
         post={props}
+        translateRef={this.postRef}
         toggleEditingPost={this.toggleEditingPost}
         toggleModeratingComments={this.toggleModeratingComments}
         disableComments={this.disableComments}
@@ -411,7 +413,7 @@ class Post extends Component {
                     comments={props.comments}
                     usersLikedPost={props.usersLikedPost}
                   />
-                  <div className="post-text">
+                  <div className="post-text" ref={this.postRef}>
                     <PieceOfText
                       text={props.body}
                       readMoreStyle={props.readMoreStyle}

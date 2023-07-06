@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Portal } from 'react-portal';
 
 import { intentToScroll } from '../../services/unscroll';
@@ -11,6 +11,7 @@ import { MoreWithTriangle } from '../more-with-triangle';
 import { TimedMessage } from '../timed-message';
 import { ButtonLink } from '../button-link';
 
+import { translate } from '../../utils/translator';
 import { PostMoreMenu } from './post-more-menu';
 
 export default function PostMoreLink({ post, user, ...props }) {
@@ -20,6 +21,20 @@ export default function PostMoreLink({ post, user, ...props }) {
     closeOn: CLOSE_ON_CLICK_OUTSIDE,
     fixed: fixedMenu,
   });
+
+  const [translateText, setTranslateText] = useState(null);
+  const [isTranslatable, setIsTranslatable] = useState(true);
+
+  const doTranslate = useCallback(async () => {
+    setTranslateText(props.translateRef.current.innerHTML);
+    props.translateRef.current.innerText = await translate(props.translateRef.current.innerText);
+    setIsTranslatable(false);
+  }, [props.translateRef, setTranslateText, setIsTranslatable]);
+
+  const undoTranslate = useCallback(() => {
+    props.translateRef.current.innerHTML = translateText;
+    setIsTranslatable(true);
+  }, [setIsTranslatable, translateText, props.translateRef]);
 
   const doAndClose = useCallback((h) => h && ((...args) => (h(...args), toggle())), [toggle]);
   const doAndForceClose = useCallback(
@@ -76,6 +91,9 @@ export default function PostMoreLink({ post, user, ...props }) {
       {opened && (
         <Portal>
           <PostMoreMenu
+            doTranslate={doTranslate}
+            undoTranslate={undoTranslate}
+            isTranslatable={isTranslatable}
             ref={menuRef}
             post={post}
             user={user}
