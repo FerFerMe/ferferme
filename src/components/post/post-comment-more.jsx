@@ -21,6 +21,20 @@ export const PostCommentMore = memo(function PostCommentMore({
   ...menuProps
 }) {
   const fixedMenu = useMediaQuery('(max-width: 450px)');
+  const [translateText, setTranslateText] = useState(null);
+  const [isTranslatable, setIsTranslatable] = useState(true);
+  const doTranslate = useCallback(async () => {
+    setTranslateText(menuProps.translateRef.current.innerHTML);
+    menuProps.translateRef.current.innerText = await translate(
+      menuProps.translateRef.current.innerText,
+    );
+    setIsTranslatable(false);
+  }, [menuProps.translateRef, setTranslateText, setIsTranslatable]);
+
+  const undoTranslate = useCallback(() => {
+    menuProps.translateRef.current.innerHTML = translateText;
+    setIsTranslatable(true);
+  }, [setIsTranslatable, translateText, menuProps.translateRef]);
 
   const { opened, toggle, pivotRef, menuRef, close, setOpened } = useDropDownKbd({
     closeOn: CLOSE_ON_CLICK_OUTSIDE,
