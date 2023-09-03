@@ -19,6 +19,7 @@ import TimeDisplay from '../time-display';
 import UserName from '../user-name';
 
 import styles from './post-comment-preview.module.scss';
+import { CommentProvider } from './post-comment-provider';
 
 export function PostCommentPreview({
   postId,
@@ -133,7 +134,7 @@ export function PostCommentPreview({
         {comment && frontPreferences.comments.showTimestamps && (
           <span className="comment-tail__item">
             <Link
-              to={`${postUrl}#comment-${comment.id}`}
+              to={`${postUrl}#${comment.shortId}`}
               className="comment-tail__timestamp"
               onClick={onClick}
             >
@@ -152,7 +153,7 @@ export function PostCommentPreview({
       style={style}
     >
       {comment ? (
-        <>
+        <CommentProvider id={comment.id}>
           {comment.hideType ? (
             <span className={styles['hidden-text']}>{commentBody}</span>
           ) : (
@@ -171,11 +172,11 @@ export function PostCommentPreview({
             </Expandable>
           )}
           <div className={styles['actions']}>
-            <Link to={`${postUrl}#comment-${comment?.id}`} onClick={onClick}>
+            <Link to={`${postUrl}#${comment?.shortId}`} onClick={onClick}>
               Go to comment
             </Link>
           </div>
-        </>
+        </CommentProvider>
       ) : getCommentStatus.error ? (
         <div className={styles['error']}>Error: {getCommentStatus.errorText}</div>
       ) : (

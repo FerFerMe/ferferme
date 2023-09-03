@@ -22,8 +22,11 @@ import { CommentEditForm } from '../comment-edit-form';
 import { ButtonLink } from '../button-link';
 import { Separated } from '../separated';
 
+import { TranslatedText } from '../translated-text';
+import { initialAsyncState } from '../../redux/async-helpers';
 import { PostCommentMore } from './post-comment-more';
 import { PostCommentPreview } from './post-comment-preview';
+import { CommentProvider } from './post-comment-provider';
 
 class PostComment extends Component {
   commentContainer;
@@ -182,7 +185,7 @@ class PostComment extends Component {
         }
         className="comment-tail"
       >
-        {' - '}
+        &nbsp;-&nbsp;
         <Separated separator=" - ">
           {this.props.user && !this.isHidden() && (
             <span className="comment-tail__item">
@@ -225,10 +228,11 @@ class PostComment extends Component {
                   getBackwardIdx={this.backwardIdx}
                   createdAt={this.props.createdAt}
                   updatedAt={this.props.updatedAt}
-                  permalink={`${this.props.entryUrl}#comment-${this.props.id}`}
+                  permalink={`${this.props.entryUrl}#${this.props.shortId}`}
                   likesCount={this.props.likes}
                   setMenuOpener={this.setMoreMenuOpener}
                   onMenuOpened={this.onMoreMenuOpened}
+                  isHidden={this.isHidden()}
                 />
               </span>
             </Separated>
@@ -236,7 +240,7 @@ class PostComment extends Component {
           {(this.props.showTimestamps || this.props.forceAbsTimestamps) && (
             <span className="comment-tail__item">
               <Link
-                to={`${this.props.entryUrl}#comment-${this.props.id}`}
+                to={`${this.props.entryUrl}#${this.props.shortId}`}
                 className="comment-tail__timestamp"
               >
                 <TimeDisplay
@@ -280,26 +284,37 @@ class PostComment extends Component {
 
     return (
       <div className="comment-body">
-        <Expandable
-          expanded={
-            this.props.readMoreStyle === READMORE_STYLE_COMPACT ||
-            this.props.isSinglePost ||
-            this.props.isExpanded
-          }
-          bonusInfo={commentTail}
-          config={commentReadmoreConfig}
-        >
-          <PieceOfText
-            text={this.props.body}
-            readMoreStyle={this.props.readMoreStyle}
-            highlightTerms={this.props.highlightTerms}
-            userHover={this.props.authorHighlightHandlers}
-            arrowHover={this.arrowHoverHandlers}
-            arrowClick={this.arrowClick}
-            showMedia={this.props.showMedia}
-          />
-          {commentTail}
-        </Expandable>
+        <CommentProvider id={this.props.id}>
+          <Expandable
+            expanded={
+              this.props.readMoreStyle === READMORE_STYLE_COMPACT ||
+              this.props.isSinglePost ||
+              this.props.isExpanded ||
+              !this.props.translateStatus.initial
+            }
+            bonusInfo={commentTail}
+            config={commentReadmoreConfig}
+          >
+            <PieceOfText
+              text={this.props.body}
+              readMoreStyle={this.props.readMoreStyle}
+              highlightTerms={this.props.highlightTerms}
+              userHover={this.props.authorHighlightHandlers}
+              arrowHover={this.arrowHoverHandlers}
+              arrowClick={this.arrowClick}
+              showMedia={this.props.showMedia}
+            />
+            <TranslatedText
+              type="comment"
+              id={this.props.id}
+              userHover={this.props.authorHighlightHandlers}
+              arrowHover={this.arrowHoverHandlers}
+              arrowClick={this.arrowClick}
+              showMedia={this.props.showMedia}
+            />
+            {commentTail}
+          </Expandable>
+        </CommentProvider>
       </div>
     );
   }
@@ -376,6 +391,7 @@ class PostComment extends Component {
 
 function selectState(state, ownProps) {
   const editState = state.commentEditState[ownProps.id] || defaultCommentState;
+  const translateStatus = state.translationStates[`comment:${ownProps.id}`] || initialAsyncState;
   const showTimestamps =
     state.user.frontendPreferences?.comments?.showTimestamps ||
     CONFIG.frontendPreferences.defaultValues.comments.showTimestamps;
@@ -398,6 +414,7 @@ function selectState(state, ownProps) {
     isEditing: ownProps.isEditing || editState.isEditing,
     submitMode: state.submitMode,
     isReplyToBanned,
+    translateStatus,
   };
 }
 

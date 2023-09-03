@@ -5,7 +5,59 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.121] - Not released
+## [1.123.0] - Not released
+### Added
+- Links to posts and comments are now shorter: e.g. `/user/4a39b8` (a post) or
+  `/groupname/f482e5#ad2b` (a comment).
+  - All public URLs and links to posts and comments are now in short format.
+  - Addresses of posts and comments with leading slash (`/user/...`) are now
+    parses in texts as active links.
+  - Old-fashion links, with long UIDs, are still fully supported.
+
+### Changed
+- Spoiler tag can now contain line feeds. In addition, user text formatting
+  utilizes simpler HTML, with fewer wrappers. Visually, the output for the user
+  is not changed (except for line translations in spoilers).
+
+### Fixed
+- The default font set no longer includes the Helvetica family when the client
+  platform is Windows. Helvetica is not a native font in Windows, and the
+  manually installed version of the font may be incomplete (for example, not
+  contain Cyrillic).
+
+## [1.122.1] - 2023-08-10
+### Changed
+- Disable player for video attachments until we can deal with the increased
+  traffic from them.
+
+## [1.122.0] - 2023-07-31
+### Added
+- Comments can now be used as checklists if the comment text starts with "[ ]"
+  or "[x]" (one can use other symbols in parentheses as well: [v], [*], [🗸], or
+  Russian "Ha").
+  
+  If the current user matches the author of the comment, an interactive checkbox
+  is displayed at the beginning of the text. When the user clicks the checkbox,
+  the comment text changes to reflect the checkbox state.
+
+  For other users, a fixed-width text representation of the checkbox is shown:
+  "[ ]" or "[🗸]".
+### Fixed
+- Telegram previews now supports dark theme
+
+## [1.121.1] - 2023-07-15
+### Fixed
+- Expand texts of translated posts/comments
+
+## [1.121] - 2023-07-15
+### Added
+- Ability to translate the text of comments and posts (if supported by the
+  server). Users can set their language for translation in the preferences (the
+  browser language is used by default). There is a new "Translate to..." item in
+  the "More" menu for comments/posts.
+### Fixed
+- User can now search for "My feed" in feeds selector
+- Increased margin under the "Expand preview" button
 
 ## [1.120.2] - 2023-06-22
 ### Fixed
