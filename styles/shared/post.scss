@@ -39,6 +39,7 @@ $post-line-height: rem(20px);
 
   .post-userpic {
     float: left;
+
     @media (max-width: 767px) {
       margin: 0 rem(10px) 3px 0;
     }
@@ -61,6 +62,7 @@ $post-line-height: rem(20px);
 
   .post-body {
     margin-left: 63px;
+
     @media (max-width: 767px) {
       margin-left: 0;
     }
@@ -72,6 +74,7 @@ $post-line-height: rem(20px);
     .post-text {
       margin-bottom: rem(8px);
       word-wrap: break-word;
+
       @media (max-width: 767px) {
         min-height: rem(31px);
       }
@@ -246,11 +249,20 @@ $post-line-height: rem(20px);
 
 // paragraph breaks
 .p-break {
+  display: block;
   height: 0.35em;
 
   .post-text & {
     height: 0.65em;
   }
+
+  .text-no-breaks & {
+    display: inline;
+  }
+}
+
+.text-no-breaks br {
+  display: none;
 }
 
 // Used in both create-post and edit-post
@@ -403,6 +415,7 @@ $post-line-height: rem(20px);
 
   .post-body {
     margin-left: 88px;
+
     @media (max-width: 767px) {
       margin-left: 0;
     }
@@ -420,9 +433,11 @@ $post-line-height: rem(20px);
 
 .timeline-post.direct-post {
   --bg-color: #eee;
+  --arrow-color: #fff;
 
   .dark-theme & {
     --bg-color: #{$bg-color-lighter};
+    --arrow-color: #{$bg-color-lightest};
   }
 
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='36' height='36' viewBox='0 0 48 48'><path fill='%23ffffff' d='M40 8H8c-2.21 0-3.98 1.79-3.98 4L4 36c0 2.21 1.79 4 4 4h32c2.21 0 4-1.79 4-4V12c0-2.21-1.79-4-4-4zm0 8L24 26 8 16v-4l16 10 16-10v4z'/></svg>");
@@ -508,7 +523,10 @@ $post-line-height: rem(20px);
         pointer-events: none;
 
         @mixin grad($color) {
-          $gradArgs: rgba($color, 0) 0%, rgba($color, 0.2) 25%, rgba($color, 0.8) 75%,
+          $gradArgs:
+            rgba($color, 0) 0%,
+            rgba($color, 0.2) 25%,
+            rgba($color, 0.8) 75%,
             rgba($color, 1) 100%;
 
           background: -webkit-linear-gradient($gradArgs);
@@ -525,7 +543,7 @@ $post-line-height: rem(20px);
     }
 
     .preview-expand {
-      margin-top: rem(8px);
+      margin-block: rem(8px);
 
       & > .preview-expand-icon {
         opacity: 0.5;
@@ -753,6 +771,48 @@ $post-line-height: rem(20px);
 
   .tiktok-video-iframe {
     width: 100%;
+  }
+
+  .opengraph-preview {
+    max-width: 500px;
+    border-radius: 10px;
+    padding: 10px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    background-color: #f8f8f8;
+    border: 1px solid #555;
+    .dark-theme & {
+      background-color: #222;
+    }
+  }
+
+  .opengraph-image {
+    max-width: 100%;
+    max-height: 300px;
+  }
+
+  .opengraph-title {
+    font-size: 1.2em;
+    margin-top: 0.5em;
+    color: #111;
+    .dark-theme & {
+      color: #d9d9d9;
+    }
+  }
+
+  .opengraph-description {
+    font-size: 1em;
+    margin-top: 0.5em;
+    color: #333;
+    .dark-theme & {
+      color: #a9a9a9;
+    }
+  }
+
+  .opengraph-source {
+    font-size: 1em;
+    margin-top: 0.5em;
+    color: #777;
   }
 }
 

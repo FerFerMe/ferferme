@@ -53,7 +53,6 @@ export default function CreatePost({ sendTo, isDirects, hideNewPostDialog }) {
   const [commentsDisabled, toggleCommentsDisabled] = useBool(false);
   const [isMoreOpen, toggleIsMoreOpen] = useBool(false);
   const [postText, setPostText] = useState(sendTo.invitation || '');
-  const [selectorVisible, setSelectorVisible, expandSendTo] = useBool(isDirects);
   const [gifActive, setgifActive] = useState(false);
   const [emojiActive, setemojiActive] = useState(false);
 
@@ -68,14 +67,14 @@ export default function CreatePost({ sendTo, isDirects, hideNewPostDialog }) {
 
   const [feeds, setFeeds] = useState(defaultFeedNames);
 
-  useEffect(() => setFeeds(defaultFeedNames), [defaultFeedNames, selectorVisible]);
+  // Update feed selector on new page
+  useEffect(() => setFeeds(defaultFeedNames), [defaultFeedNames]);
 
   const resetLocalState = useCallback(() => {
     toggleCommentsDisabled(false);
     toggleIsMoreOpen(false);
     setPostText(sendTo.invitation || '');
-    setSelectorVisible(isDirects);
-  }, [isDirects, sendTo.invitation, setSelectorVisible, toggleCommentsDisabled, toggleIsMoreOpen]);
+  }, [sendTo.invitation, toggleCommentsDisabled, toggleIsMoreOpen]);
 
   // Uploading files
   const {
@@ -86,9 +85,6 @@ export default function CreatePost({ sendTo, isDirects, hideNewPostDialog }) {
     uploadProgressProps,
     postAttachmentsProps,
   } = useUploader({ maxCount: maxFilesCount });
-
-  // Expand SendTo if we have some files
-  useEffect(() => void (fileIds.length > 0 && expandSendTo()), [expandSendTo, fileIds.length]);
 
   const doChooseFiles = useFileChooser(uploadFile, { multiple: true });
 
@@ -201,21 +197,18 @@ export default function CreatePost({ sendTo, isDirects, hideNewPostDialog }) {
       <ErrorBoundary>
         <PreventPageLeaving prevent={isFormDirty} />
         <div>
-          {selectorVisible && (
-            <Selector
-              mode={isDirects ? CREATE_DIRECT : CREATE_REGULAR}
-              feedNames={feeds}
-              onChange={setFeeds}
-              onError={setHasFeedsError}
-            />
-          )}
+          <Selector
+            mode={isDirects ? CREATE_DIRECT : CREATE_REGULAR}
+            feedNames={feeds}
+            onChange={setFeeds}
+            onError={setHasFeedsError}
+          />
           <SmartTextarea
             ref={textareaRef}
             className="post-textarea"
             dragOverClassName="post-textarea__dragged"
             value={postText}
             onText={setPostText}
-            onFocus={expandSendTo}
             onSubmit={doCreatePost}
             onFile={uploadFile}
             minRows={3}

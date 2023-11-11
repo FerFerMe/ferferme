@@ -1,83 +1,80 @@
 /* global CONFIG */
 import {
-  withText,
+  withTexts,
   combine,
-  hashTags,
+  hashtags,
   emails,
   mentions,
   foreignMentions,
   links,
   arrows,
-  Link as TLink,
-  Arrows as TArrows,
+  LINK,
 } from 'social-text-tokenizer';
 
-import { byRegexp, wordAdjacentChars } from 'social-text-tokenizer/cjs/lib';
-import {
-  tokenizerStartSpoiler,
-  tokenizerEndSpoiler,
-  StartSpoiler,
-  EndSpoiler,
-} from './spoiler-tokens';
+import { linkHref } from 'social-text-tokenizer/prettifiers';
+import { makeToken, reTokenizer, wordAdjacentChars } from 'social-text-tokenizer/utils';
+import { withCharsAfter, withCharsBefore, withFilters } from 'social-text-tokenizer/filters';
+import { checkboxParser } from './initial-checkbox';
+import { SPOILER_END, SPOILER_START, spoilerTags, validateSpoilerTags } from './spoiler-tokens';
 
 const {
   textFormatter: { tldList, foreignMentionServices },
   siteDomains,
 } = CONFIG;
 
-export class Link extends TLink {
-  localDomains = [];
-  hostname = null;
-  path = '/';
-  link;
+const shortLinkRe = /\/[a-z\d-]{3,35}\/[\da-f]{6,10}(?:#[\da-f]{4,6})?/gi;
+const shortLinkExactRe = /^\/[a-z\d-]{3,35}\/[\da-f]{6,10}(?:#[\da-f]{4,6})?$/i;
 
-  constructor(link, localDomains) {
-    super(link.offset, link.text);
-    this.link = link;
-    this.localDomains = localDomains;
-
-    const m = this.link.href.match(/^https?:\/\/([^/]+)(.*)/i);
-    if (m) {
-      this.hostname = m[1].toLowerCase();
-      this.path = m[2] || '/';
-    }
+/**
+ * @param {string} text
+ * @param {string[]} localDomains
+ * @returns {boolean}
+ */
+export function isLocalLink(text, localDomains = siteDomains) {
+  let url;
+  try {
+    url = new URL(linkHref(text));
+  } catch {
+    return false;
   }
 
-  get href() {
-    return this.link.href;
+  const p = localDomains.indexOf(url.host);
+  if (p === -1) {
+    return false;
+  } else if (p === 0) {
+    // First domain in localDomains list is the domain of main site.
+    // These links are always local.
+    return true;
   }
 
-  get isLocal() {
-    const p = this.localDomains.indexOf(this.hostname);
-    if (p === -1) {
-      return false;
-    } else if (p === 0) {
-      // First domain in localDomains list is the domain of main site.
-      // These links are always local.
-      return true;
-    }
-
-    // Other domains in localDomains list are alternative frontends or mirrors.
-    // Such links should be treated as remote if theay lead to the domain root.
-    return this.path !== '/';
-  }
-
-  get localURI() {
-    return this.path;
-  }
+  // Other domains in localDomains list are alternative frontends or mirrors.
+  // Such links should be treated as remote if they lead to the domain root.
+  return url.pathname + url.search !== '/';
 }
 
-export class Arrows extends TArrows {
-  constructor(token) {
-    super(token.offset, token.text);
-  }
+/**
+ * @param {string} text - Part of URL without origin (i.e. /path?query#hash)
+ * @returns {boolean}
+ */
+export function isShortLink(text) {
+  return shortLinkExactRe.test(text);
+}
 
-  get level() {
-    if (/\d/.test(this.text)) {
-      return Number(this.text.replace(/\D/g, ''));
-    }
-    return this.text.length;
+export function trimOrigin(text) {
+  let url;
+  try {
+    url = new URL(linkHref(text));
+  } catch {
+    return text;
   }
+  return url.pathname + url.search + url.hash;
+}
+
+export function arrowsLevel(text) {
+  if (/\d/.test(text)) {
+    return Number(text.replace(/\D/g, ''));
+  }
+  return text.length;
 }
 
 const tldRe = [...tldList]
@@ -97,117 +94,79 @@ const tldRe = [...tldList]
   })
   .join('|');
 
-// Make sure that the list of tokens contains only
-// valid pairs of StartSpoiler/EndSpoiler tokens
-const validateSpoilerTags = (tokenizer) => {
-  return function (text) {
-    const validated = [];
-    let startSpoilerIndex = -1;
-    const tokens = tokenizer(text);
+export const LINE_BREAK = 'LINE_BREAK';
+export const PARAGRAPH_BREAK = 'PARAGRAPH_BREAK';
+export const REDDIT_LINK = 'REDDIT_LINK';
+export const SHORT_LINK = 'SHORT_LINK';
 
-    tokens.forEach((token, i) => {
-      if (token instanceof StartSpoiler) {
-        if (startSpoilerIndex !== -1) {
-          // previous StartSpoiler is invalid
-          validated[startSpoilerIndex] = null;
-        }
-        startSpoilerIndex = i;
-        validated.push(token);
-      } else if (token instanceof EndSpoiler) {
-        if (startSpoilerIndex !== -1) {
-          startSpoilerIndex = -1;
-          validated.push(token);
-        }
-      } else {
-        validated.push(token);
-      }
-    });
+const redditLinks = withFilters(
+  reTokenizer(/\/?r\/[A-Za-z\d]\w{1,20}/g, makeToken(REDDIT_LINK)),
+  withCharsBefore(wordAdjacentChars.withoutChars('/')),
+  withCharsAfter(wordAdjacentChars.withoutChars('/')),
+);
 
-    if (startSpoilerIndex !== -1) {
-      // un-closed StartSpoiler
-      validated[startSpoilerIndex] = null;
-    }
-
-    return validated.filter(Boolean);
-  };
-};
-
-export class RedditLink extends TLink {
-  get href() {
-    let path = this.text;
-    if (!path.startsWith('/')) {
-      path = `/${path}`;
-    }
-    return `https://www.reddit.com${path}`;
+export function redditLinkHref(text) {
+  if (!text.startsWith('/')) {
+    text = `/${text}`;
   }
+  return `https://www.reddit.com${text}`;
 }
 
-const redditLinks = () => {
-  const beforeChars = new RegExp(`[${wordAdjacentChars}]`);
-  const afterChars = new RegExp(`[${wordAdjacentChars.clone().removeChars('/')}]`);
-  return byRegexp(/\/?r\/[A-Za-z\d]\w{1,20}/g, (offset, text, match) => {
-    const charBefore = match.input.charAt(offset - 1);
-    const charAfter = match.input.charAt(offset + text.length);
-    if (charBefore !== '' && !beforeChars.test(charBefore)) {
-      return null;
-    }
-    if (charAfter !== '' && !afterChars.test(charAfter)) {
-      return null;
-    }
+const shortLinks = withFilters(
+  reTokenizer(shortLinkRe, makeToken(SHORT_LINK)),
+  withCharsBefore(wordAdjacentChars.withoutChars('/')),
+  withCharsAfter(wordAdjacentChars.withoutChars('/')),
+);
 
-    return new RedditLink(offset, text);
-  });
-};
+export const lineBreaks = reTokenizer(/[^\S\n]*\n\s*/g, (offset, text) => {
+  if (text.indexOf('\n') === text.lastIndexOf('\n')) {
+    return makeToken(LINE_BREAK)(offset, text);
+  }
+  return makeToken(PARAGRAPH_BREAK)(offset, text);
+});
 
-const tokenize = withText(
+export const parseText = withTexts(
   validateSpoilerTags(
     combine(
-      hashTags(),
+      hashtags(),
       emails(),
       mentions(),
       foreignMentions(),
       links({ tldRe }),
-      redditLinks(),
       arrows(/\u2191+|\^([1-9]\d*|\^*)/g),
-      tokenizerStartSpoiler,
-      tokenizerEndSpoiler,
+      shortLinks,
+      redditLinks,
+      spoilerTags,
+      checkboxParser,
+      lineBreaks,
     ),
   ),
 );
-
-const enhanceToken = (token) => {
-  if (token instanceof TLink) {
-    return new Link(token, siteDomains);
-  } else if (token instanceof TArrows) {
-    return new Arrows(token);
-  }
-  return token;
-};
-
-export const parseText = (text) => tokenize(text).map(enhanceToken);
 
 export function getFirstLinkToEmbed(text) {
   let isInSpoiler = false;
 
   const firstLink = parseText(text).find((token) => {
-    if (token instanceof StartSpoiler) {
+    if (token.type === SPOILER_START) {
       isInSpoiler = true;
     }
 
-    if (token instanceof EndSpoiler) {
+    if (token.type === SPOILER_END) {
       isInSpoiler = false;
     }
 
-    if (!(token instanceof Link) || isInSpoiler) {
+    if (isInSpoiler || token.type !== LINK) {
       return false;
     }
 
     return (
-      !token.isLocal && /^https?:\/\//i.test(token.text) && text.charAt(token.offset - 1) !== '!'
+      !isLocalLink(token.text) &&
+      /^https?:\/\//i.test(token.text) &&
+      text.charAt(token.offset - 1) !== '!'
     );
   });
 
-  return firstLink ? firstLink.href : undefined;
+  return firstLink ? linkHref(firstLink.text) : undefined;
 }
 
 export const shortCodeToService = {};

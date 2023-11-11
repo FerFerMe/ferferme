@@ -33,6 +33,7 @@ import { UserPicture } from '../user-picture';
 
 import { prepareAsyncFocus } from '../../utils/prepare-async-focus';
 import { format } from '../../utils/date-format';
+import { TranslatedText } from '../translated-text';
 import { UnhideOptions, HideLink } from './post-hides-ui';
 import PostMoreLink from './post-more-link';
 import PostLikeLink from './post-like-link';
@@ -42,6 +43,7 @@ import PostComments from './post-comments';
 import PostLikes from './post-likes';
 import { PostContext } from './post-context';
 import { PostEditForm } from './post-edit-form';
+import { PostProvider } from './post-comment-provider';
 
 class Post extends Component {
   selectFeeds;
@@ -348,7 +350,7 @@ class Post extends Component {
               <Icon icon={faShare} className="post-footer-backlink-icon" />
             </div>
             <span className="post-footer-content">
-              <Link to={`/search?q=${encodeURIComponent(props.id)}`}>
+              <Link to={`${canonicalPostURI}/backlinks`}>
                 {pluralForm(props.backlinksCount, 'reference')} to this post
               </Link>
             </span>
@@ -376,132 +378,136 @@ class Post extends Component {
     const { role, postLabel } = this.getAriaLabels();
 
     return (
-      <div
-        className={postClass}
-        data-author={props.createdBy.username}
-        role={role}
-        aria-label={postLabel}
-      >
-        <ErrorBoundary>
-          <Expandable
-            expanded={
-              props.isEditing ||
-              props.isSinglePost ||
-              props.readMoreStyle === READMORE_STYLE_COMPACT
-            }
-            config={postReadmoreConfig}
-          >
-            <div className="post-userpic">
-              <UserPicture
-                className="post-userpic-img"
-                large={props.isSinglePost}
-                user={props.createdBy}
-                loading="lazy"
-              />
-            </div>
-            <div className="post-body" role="region" aria-label="Post body">
-              {props.isEditing ? (
-                <PostEditForm {...props} />
-              ) : (
-                <>
-                  <PostHeader
-                    createdBy={props.createdBy}
-                    isDirect={props.isDirect}
-                    user={this.props.user}
-                    isInHomeFeed={this.props.isInHomeFeed}
-                    recipients={props.recipients}
-                    comments={props.comments}
-                    usersLikedPost={props.usersLikedPost}
-                  />
-                  <div className="post-text" ref={this.postRef}>
-                    <PieceOfText
-                      text={props.body}
-                      readMoreStyle={props.readMoreStyle}
-                      highlightTerms={props.highlightTerms}
-                      showMedia={this.props.showMedia}
+      <PostProvider id={this.props.id}>
+        <div
+          className={postClass}
+          data-author={props.createdBy.username}
+          role={role}
+          aria-label={postLabel}
+        >
+          <ErrorBoundary>
+            <Expandable
+              expanded={
+                props.isEditing ||
+                props.isSinglePost ||
+                props.readMoreStyle === READMORE_STYLE_COMPACT ||
+                !props.translateStatus.initial
+              }
+              config={postReadmoreConfig}
+            >
+              <div className="post-userpic">
+                <UserPicture
+                  className="post-userpic-img"
+                  large={props.isSinglePost}
+                  user={props.createdBy}
+                  loading="lazy"
+                />
+              </div>
+              <div className="post-body" role="region" aria-label="Post body">
+                {props.isEditing ? (
+                  <PostEditForm {...props} />
+                ) : (
+                  <>
+                    <PostHeader
+                      createdBy={props.createdBy}
+                      isDirect={props.isDirect}
+                      user={this.props.user}
+                      isInHomeFeed={this.props.isInHomeFeed}
+                      recipients={props.recipients}
+                      comments={props.comments}
+                      usersLikedPost={props.usersLikedPost}
                     />
+                    <div className="post-text">
+                      <PieceOfText
+                        text={props.body}
+                        readMoreStyle={props.readMoreStyle}
+                        highlightTerms={props.highlightTerms}
+                        showMedia={this.props.showMedia}
+                      />
+                      <TranslatedText type="post" id={props.id} showMedia={this.props.showMedia} />
+                    </div>
+                  </>
+                )}
+              </div>
+            </Expandable>
+            {!props.isEditing && (
+              <>
+                {this.props.attachments.length > 0 && (
+                  <div className="post-body" role="region" aria-label="Post attachments">
+                    <PostAttachments
+                      postId={props.id}
+                      attachmentIds={this.props.attachments}
+                      isEditing={false}
+                      isSinglePost={props.isSinglePost}
+                      showMedia={this.props.showMedia}
+                      removeAttachment={this.removeAttachment}
+                      reorderImageAttachments={this.reorderImageAttachments}
+                    />
+                    {!this.props.noImageAttachments && props.isNSFW && (
+                      <div className="nsfw-bar">
+                        Turn the <Link to="/settings/appearance#nsfw">NSFW filter</Link> off to
+                        enable previews for sensitive content
+                      </div>
+                    )}
                   </div>
-                </>
-              )}
-            </div>
-          </Expandable>
-          {!props.isEditing && (
-            <>
-              {this.props.attachments.length > 0 && (
-                <div className="post-body" role="region" aria-label="Post attachments">
-                  <PostAttachments
-                    postId={props.id}
-                    attachmentIds={this.props.attachments}
-                    isEditing={false}
-                    isSinglePost={props.isSinglePost}
-                    showMedia={this.props.showMedia}
-                    removeAttachment={this.removeAttachment}
-                    reorderImageAttachments={this.reorderImageAttachments}
-                  />
-                  {!this.props.noImageAttachments && props.isNSFW && (
-                    <div className="nsfw-bar">
-                      Turn the <Link to="/settings/appearance#nsfw">NSFW filter</Link> off to enable
-                      previews for sensitive content
-                    </div>
-                  )}
-                </div>
-              )}
+                )}
 
-              {linkToEmbed && this.props.noImageAttachments && (
-                <div className="post-body">
-                  {props.isNSFW ? (
-                    <div className="nsfw-bar">
-                      Turn the <Link to="/settings/appearance#nsfw">NSFW filter</Link> off to enable
-                      previews for sensitive content
-                    </div>
-                  ) : (
-                    <div className="link-preview" role="region" aria-label="Link preview">
-                      <LinkPreview url={linkToEmbed} allowEmbedly={props.allowLinksPreview} />
-                    </div>
-                  )}
-                </div>
-              )}
-            </>
-          )}
-
-          <div className="post-body">
-            {this.renderPostActions()}
-
-            {this.state.unHideOpened && (
-              <UnhideOptions
-                isHidden={props.isHidden}
-                hiddenByCriteria={props.hiddenByCriteria}
-                handleUnhideByCriteria={this.handleUnhideByCriteria}
-                handleFullUnhide={this.handleFullUnhide}
-              />
+                {linkToEmbed && this.props.noImageAttachments && (
+                  <div className="post-body">
+                    {props.isNSFW ? (
+                      <div className="nsfw-bar">
+                        Turn the <Link to="/settings/appearance#nsfw">NSFW filter</Link> off to
+                        enable previews for sensitive content
+                      </div>
+                    ) : (
+                      <div className="link-preview" role="region" aria-label="Link preview">
+                        <LinkPreview url={linkToEmbed} allowEmbedly={props.allowLinksPreview} />
+                      </div>
+                    )}
+                  </div>
+                )}
+              </>
             )}
 
-            <PostLikes
-              post={props}
-              likes={props.usersLikedPost}
-              showMoreLikes={props.showMoreLikes}
-            />
+            <div className="post-body">
+              {this.renderPostActions()}
 
-            <PostComments
-              post={props}
-              comments={props.comments}
-              creatingNewComment={props.isCommenting}
-              addComment={props.addComment}
-              toggleCommenting={props.toggleCommenting}
-              showMoreComments={props.showMoreComments}
-              showMedia={props.showMedia}
-              commentEdit={props.commentEdit}
-              readMoreStyle={props.readMoreStyle}
-              entryUrl={canonicalPostURI}
-              highlightTerms={props.highlightTerms}
-              isSinglePost={props.isSinglePost}
-              forceAbsTimestamps={this.state.forceAbsTimestamps}
-              user={props.user}
-              preopened={props.justCreated}
-            />
-          </div>
-        </ErrorBoundary>
-      </div>
+              {this.state.unHideOpened && (
+                <UnhideOptions
+                  isHidden={props.isHidden}
+                  hiddenByCriteria={props.hiddenByCriteria}
+                  handleUnhideByCriteria={this.handleUnhideByCriteria}
+                  handleFullUnhide={this.handleFullUnhide}
+                />
+              )}
+
+              <PostLikes
+                post={props}
+                likes={props.usersLikedPost}
+                showMoreLikes={props.showMoreLikes}
+              />
+
+              <PostComments
+                post={props}
+                comments={props.comments}
+                creatingNewComment={props.isCommenting}
+                addComment={props.addComment}
+                toggleCommenting={props.toggleCommenting}
+                showMoreComments={props.showMoreComments}
+                showMedia={props.showMedia}
+                commentEdit={props.commentEdit}
+                readMoreStyle={props.readMoreStyle}
+                entryUrl={canonicalPostURI}
+                highlightTerms={props.highlightTerms}
+                isSinglePost={props.isSinglePost}
+                forceAbsTimestamps={this.state.forceAbsTimestamps}
+                user={props.user}
+                preopened={props.justCreated}
+              />
+            </div>
+          </ErrorBoundary>
+        </div>
+      </PostProvider>
     );
   }
 }
@@ -515,6 +521,7 @@ function selectState(state, ownProps) {
 
   return {
     hideStatus: state.postHideStatuses[ownProps.id] || initialAsyncState,
+    translateStatus: state.translationStates[`post:${ownProps.id}`] || initialAsyncState,
     submitMode: state.submitMode,
     noImageAttachments,
   };

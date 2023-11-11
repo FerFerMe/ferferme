@@ -1,7 +1,8 @@
 # Usage
 
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FFerFerMe%2Fferferme.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FFerFerMe%2Fferferme?ref=badge_shield)
-[Node.js](https://nodejs.org) 14 or 16 is supported.
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FFreeFeed%2Ffreefeed-react-client.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2FFreeFeed%2Ffreefeed-react-client?ref=badge_shield)
+
+[Node.js](https://nodejs.org) versions 16, 18, 20 are supported.
 
 We use [yarn](https://yarnpkg.com/) as dependency manager (instead of npm) so you need to install it and run `yarn` after downloading this code. If you're using Windows, you should install developer tools by using `npm install --global --production windows-build-tools` from an elevated PowerShell or CMD.exe (run as Administrator).
 
@@ -9,7 +10,7 @@ We use [yarn](https://yarnpkg.com/) as dependency manager (instead of npm) so yo
 
 Run `yarn start`. By default it will use our staging backend [candy.freefeed.net](https://candy.freefeed.net).
 
-Alternatively, you can install [freefeed-server](https://github.com/FreeFeed/freefeed-server) and create `config/local.json` file with URL of local backend:
+Alternatively, you can install [freefeed-server](https://github.com/FreeFeed/freefeed-server) and create `config.json` file with URL of local backend:
 ```
 {
   "api": {
@@ -18,12 +19,12 @@ Alternatively, you can install [freefeed-server](https://github.com/FreeFeed/fre
 }
 ```
 
-You can also use custom local configuration file or additional environment variables to override default settings. FreeFeed uses the [config](https://github.com/lorenwest/node-config) npm module to manage the configuration. Please read it documentation to learn how add custom settings.
+You can also override any other configuration values. See [config/README.md](config/README.md) for details.
 
 ## Sanity checks
 
 1. `yarn test` will build test-suite and run the tests
-1. `yarn lint` will check if sourcecode complies to the coding guidelines
+1. `yarn lint` will check if source code complies to the coding guidelines
 
 ## Build a production version
 

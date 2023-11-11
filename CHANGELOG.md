@@ -5,7 +5,114 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.121] - Not released
+## [1.125.0] - Not released
+### Added
+- Add OpenGraphPreview component and integrate into LinkPreview
+  - Add OpenGraphPreview component to fetch and parse Open Graph metadata from pages
+  - Integrated OpenGraphPreview into LinkPreview to show open graph preview if no other specific preview available for a URL
+  - Created thoughtful styling for the OpenGraphPreview for a clean, polished, and readable design
+  - OpenGraphPreview provides a fallback preview option for sites that implement Open Graph metadata
+  - Parsing logic simplified using DOMParser and meta tag selectors
+
+### Changed
+- Update LinkPreview component to check for Open Graph data and show OpenGraphPreview
+
+## [1.124.2] - 2023-10-25
+### Fixed
+- Checkboxes in texts was broken during the 'social-text-tokenizer' upgrade.
+
+## [1.124.1] - 2023-10-11
+### Fixed
+- Some SASS issues.
+
+## [1.124.0] - 2023-10-11
+### Changed
+- The feed selector ('To:' line) is now always visible in the post creation
+  form.
+- The "Edit list" link is no longer shown next to the Home or friend list page
+  title. It has been moved to the "•••" menu on the right side of the list
+  header.
+- Upgrade 'social-text-tokenizer' (the post/comment texts parser) to the version
+  3.0.
+
+### Fixed
+- Reddit r/-links were displayed incorrectly.
+- During direct message editing, there is no access check of the existing
+  recipients (even if some of them are gone). This check is unnecessary because
+  the message author cannot remove the existing recipients anyway.
+
+## [1.123.3] - 2023-09-15
+### Fixed
+- The algorithm for displaying the "Expand" button in "compact" text mode has
+  been fixed.
+
+## [1.123.2] - 2023-09-10
+### Fixed
+- Post actions didn't work on the post backlinks page.
+
+## [1.123.1] - 2023-09-07
+### Fixed
+- The non-existent post page did not display the correct error message.
+
+## [1.123.0] - 2023-09-05
+### Added
+- Links to posts and comments are now shorter: e.g. `/user/4a39b8` (a post) or
+  `/groupname/f482e5#ad2b` (a comment).
+  - All public URLs and links to posts and comments are now in short format.
+  - Addresses of posts and comments with leading slash (`/user/...`) are now
+    parses in texts as active links.
+  - Old-fashion links, with long UIDs, are still fully supported.
+- New page(s) `/:userName/:postId/backlinks` that displays posts that link to
+  this post. This replaces the old way of displaying backlinks, which used
+  search.
+
+### Changed
+- Spoiler tag can now contain line feeds. In addition, user text formatting
+  utilizes simpler HTML, with fewer wrappers. Visually, the output for the user
+  is not changed (except for line translations in spoilers).
+- Text checkboxes are not processed in a special way if there is more than one
+  of them in the text.
+
+### Fixed
+- The default font set no longer includes the Helvetica family when the client
+  platform is Windows. Helvetica is not a native font in Windows, and the
+  manually installed version of the font may be incomplete (for example, not
+  contain Cyrillic).
+- Updated TWEET_RE regex to support matching x.com in addition to twitter.com.
+
+## [1.122.1] - 2023-08-10
+### Changed
+- Disable player for video attachments until we can deal with the increased
+  traffic from them.
+
+## [1.122.0] - 2023-07-31
+### Added
+- Comments can now be used as checklists if the comment text starts with "[ ]"
+  or "[x]" (one can use other symbols in parentheses as well: [v], [*], [🗸], or
+  Russian "Ha").
+  
+  If the current user matches the author of the comment, an interactive checkbox
+  is displayed at the beginning of the text. When the user clicks the checkbox,
+  the comment text changes to reflect the checkbox state.
+
+  For other users, a fixed-width text representation of the checkbox is shown:
+  "[ ]" or "[🗸]".
+### Fixed
+- Telegram previews now supports dark theme
+
+## [1.121.1] - 2023-07-15
+### Fixed
+- Expand texts of translated posts/comments
+
+## [1.121] - 2023-07-15
+### Added
+- Ability to translate the text of comments and posts (if supported by the
+  server). Users can set their language for translation in the preferences (the
+  browser language is used by default). There is a new "Translate to..." item in
+  the "More" menu for comments/posts.
+### Fixed
+- User can now search for "My feed" in feeds selector
+- Increased margin under the "Expand preview" button
 
 ## [1.120.2] - 2023-06-22
 ### Fixed

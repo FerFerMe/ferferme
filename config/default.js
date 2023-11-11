@@ -10,13 +10,12 @@ export default {
   },
 
   siteTitle: 'FreeFeed',
+
   siteOrigin: 'https://freefeed.net',
+
   auth: {
     tokenPrefix: 'freefeed_',
     userStorageKey: 'whoamiCache',
-  },
-  sentry: {
-    publicDSN: 'https://abdac1f2db2d45efaa9142062fe14bd8@sentry.io/75960',
   },
   captcha: {
     siteKey: '6LdChhITAAAAAGzgvUPPCbg0cxJzcxFc5vlBs9u5',
@@ -59,38 +58,19 @@ export default {
     description: 1500,
   },
 
-  minPasswordLength: 9,
-  textFormatter: {
-    tldList: TLDs,
-    foreignMentionServices: [
-      { title: 'Facebook', linkTpl: 'https://www.facebook.com/{}', shortCodes: ['fb', 'facebook'] },
-      { title: 'FreeFeed', linkTpl: 'https://freefeed.net/{}', shortCodes: ['freefeed'] },
-      { title: 'GitHub', linkTpl: 'https://github.com/{}', shortCodes: ['github'] },
-      {
-        title: 'Instagram',
-        linkTpl: 'https://www.instagram.com/{}/',
-        shortCodes: ['ig', 'instagram'],
-      },
-      {
-        title: 'LiveJournal',
-        linkTpl: 'https://users.livejournal.com/{}/',
-        shortCodes: ['lj', 'livejournal'],
-      },
-      { title: 'Mokum', linkTpl: 'https://mokum.place/{}', shortCodes: ['mokum'] },
-      { title: 'Telegram', linkTpl: 'https://t.me/{}', shortCodes: ['tg', 'telegram'] },
-      { title: 'Twitter', linkTpl: 'https://twitter.com/{}', shortCodes: ['twitter'] },
-    ],
+  sentry: {
+    publicDSN: 'https://abdac1f2db2d45efaa9142062fe14bd8@sentry.io/75960',
   },
 
   frontendPreferences: {
-    clientId: 'me.freefeed',
+    clientId: 'org.eu.freefeed',
     // Use only plain JSON types here. Do not use null values (for type checking).
     defaultValues: {
       displayNames: {
         displayOption: DISPLAYNAMES_BOTH,
         useYou: true,
       },
-      realtimeActive: false,
+      realtimeActive: true,
       comments: {
         omitRepeatedBubbles: true,
         highlightComments: true,
@@ -110,6 +90,7 @@ export default {
         amPm: false,
       },
       timeDifferenceForSpacer: DAY_IN_MILLISECONDS * 6,
+      translateToLang: '', // Empty string means browser default language
     },
     defaultOverrides: {
       /**
@@ -143,7 +124,39 @@ export default {
     minFolded: 3,
   },
 
-  // if false, new users are public by default *
+  // if false, new users are public by default
+  newUsersProtected: true,
+
+  registrationsLimit: {
+    emailFormIframeSrc: null,
+  },
+
+  registrationsByInvite: {
+    formIframeSrc:
+      'https://docs.google.com/forms/d/e/1FAIpQLSdBzsUIHzR57Ylt2AfUfbIf9Bc03I8Oq2SdQmYqp0s-OsWmnw/viewform',
+  },
+
+  analytics: {
+    google: null,
+  },
+
+  betaChannel: {
+    // Set to true to enable 'Use the beta version' switcher in settings
+    enabled: false,
+    // Is the current instance is a beta instance?
+    isBeta: false,
+    subHeading: 'Beta',
+    cookieName: 'beta_channel',
+    cookieValue: '1',
+  },
+
+  maxLength: {
+    post: 3000,
+    comment: 3000,
+    description: 1500,
+  },
+
+  minPasswordLength: 9,
 
   appVersionCheck: {
     // Use real URL/URI here to enable update check

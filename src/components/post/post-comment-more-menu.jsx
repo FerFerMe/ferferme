@@ -22,7 +22,9 @@ import TimeDisplay from '../time-display';
 import { useCommentLikers } from '../comment-likers';
 import { Icon } from '../fontawesome-icons';
 import styles from '../dropdown-menu.module.scss';
+import { MenuItemTranslate } from './menu-item-translate';
 
+// eslint-disable-next-line complexity
 export const PostCommentMoreMenu = forwardRef(function PostCommentMore(
   {
     id,
@@ -42,9 +44,7 @@ export const PostCommentMoreMenu = forwardRef(function PostCommentMore(
     doAndClose,
     likesCount,
     fixed = false,
-    doTranslate,
-    undoTranslate,
-    isTranslatable,
+    isHidden,
   },
   menuRef,
 ) {
@@ -109,6 +109,11 @@ export const PostCommentMoreMenu = forwardRef(function PostCommentMore(
             <Iconic icon={faAngleUp}>Reply with {arrows}</Iconic>
           </ButtonLink>
         </div>
+      ),
+    ],
+    [
+      !isHidden && (
+        <MenuItemTranslate key="translate" type="comment" id={id} doAndClose={doAndClose} />
       ),
     ],
     [

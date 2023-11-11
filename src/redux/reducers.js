@@ -253,7 +253,7 @@ export function feedViewState(state = initFeed, action) {
       };
     }
     case response(ActionTypes.GET_SINGLE_POST): {
-      const { postId } = action.request;
+      const { id: postId } = action.payload.posts;
       return {
         ...initFeed,
         entries: [postId],
@@ -1318,8 +1318,11 @@ export function singlePostId(state = null, action) {
   if (ActionHelpers.isFeedRequest(action)) {
     return null;
   }
-  if (action.type == request(ActionTypes.GET_SINGLE_POST)) {
-    return action.payload.postId;
+  if (action.type == response(ActionTypes.GET_SINGLE_POST)) {
+    return action.payload.posts.id;
+  }
+  if (action.type == fail(ActionTypes.GET_SINGLE_POST)) {
+    return action.request.postId;
   }
   return state;
 }
@@ -2168,3 +2171,5 @@ export const calendarMonthDays = fromResponse(
 );
 
 export { userStatsStatus, userStats } from './reducers/dynamic-user-stats';
+
+export { translationStates, translationResults } from './reducers/translation';
