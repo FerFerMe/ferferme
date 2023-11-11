@@ -11,15 +11,15 @@ export default {
 
   siteTitle: 'FreeFeed',
 
-  siteOrigin: 'http://localhost:3333',
+  siteOrigin: 'https://freefeed.net',
 
   auth: {
     tokenPrefix: 'freefeed_',
-    userStorageKey: 'USER_KEY',
+    userStorageKey: 'whoamiCache',
   },
 
   captcha: {
-    siteKey: '',
+    siteKey: '6LdChhITAAAAAGzgvUPPCbg0cxJzcxFc5vlBs9u5',
   },
 
   search: {
@@ -30,6 +30,7 @@ export default {
     // for transform links in the posts, comments, etc.
     'freefeed.net',
     'gamma.freefeed.net',
+    'freefeed.eu.org',
   ],
 
   textFormatter: {
@@ -46,18 +47,18 @@ export default {
   },
 
   sentry: {
-    publicDSN: null,
+    publicDSN: 'https://abdac1f2db2d45efaa9142062fe14bd8@sentry.io/75960',
   },
 
   frontendPreferences: {
-    clientId: 'net.freefeed',
+    clientId: 'org.eu.freefeed',
     // Use only plain JSON types here. Do not use null values (for type checking).
     defaultValues: {
       displayNames: {
         displayOption: DISPLAYNAMES_BOTH,
         useYou: true,
       },
-      realtimeActive: false,
+      realtimeActive: true,
       comments: {
         omitRepeatedBubbles: true,
         highlightComments: true,
@@ -112,14 +113,15 @@ export default {
   },
 
   // if false, new users are public by default
-  newUsersProtected: false,
+  newUsersProtected: true,
 
   registrationsLimit: {
     emailFormIframeSrc: null,
   },
 
   registrationsByInvite: {
-    formIframeSrc: null,
+    formIframeSrc:
+      'https://docs.google.com/forms/d/e/1FAIpQLSdBzsUIHzR57Ylt2AfUfbIf9Bc03I8Oq2SdQmYqp0s-OsWmnw/viewform',
   },
 
   analytics: {
