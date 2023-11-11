@@ -49,7 +49,7 @@ export default {
     // for transform links in the posts, comments, etc.
     'freefeed.net',
     'gamma.freefeed.net',
-    'freefeed.me',
+    'freefeed.eu.org',
   ],
 
   attachments: { maxCount: 20 },
