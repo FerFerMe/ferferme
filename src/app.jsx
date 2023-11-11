@@ -415,12 +415,12 @@ appRoot.innerHTML = '';
     .catch(() => console.log('Analytics Failure.'))
     .finally(() => {
       ReactDOM.render(
-          <Provider store={store}>
-            <DialogProvider>
-              <App />
-            </DialogProvider>
-          </Provider>,
-          appRoot,
+        <Provider store={store}>
+          <DialogProvider>
+            <App />
+          </DialogProvider>
+        </Provider>,
+        appRoot,
       );
     });
 })();
