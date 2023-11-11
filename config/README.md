@@ -30,4 +30,4 @@ configuration parameters without recompiling all the code.
 
 You can also use this file with the development server. Just place a
 _config.json_ to the project root (near the _package.json_). Bear in mind that
-this file will not be included in compiled code!
+this file will not be included in compiled code.
