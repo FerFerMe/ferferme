@@ -17,7 +17,6 @@ export default {
     tokenPrefix: 'freefeed_',
     userStorageKey: 'whoamiCache',
   },
-
   captcha: {
     siteKey: '6LdChhITAAAAAGzgvUPPCbg0cxJzcxFc5vlBs9u5',
   },
@@ -25,7 +24,26 @@ export default {
   search: {
     searchEngine: null,
   },
-
+  analytics: {
+    google: 'UA-240175117-2',
+  },
+  newUsersProtected: true,
+  registrationsLimit: {
+    emailFormIframeSrc: null,
+  },
+  registrationsByInvite: {
+    formIframeSrc:
+      'https://docs.google.com/forms/d/e/1FAIpQLSdBzsUIHzR57Ylt2AfUfbIf9Bc03I8Oq2SdQmYqp0s-OsWmnw/viewform',
+  },
+  betaChannel: {
+    // Set to true to enable 'Use the beta version' switcher in settings
+    enabled: false,
+    // Is the current instance is a beta instance?
+    isBeta: false,
+    subHeading: 'Beta',
+    cookieName: 'beta_channel',
+    cookieValue: '1',
+  },
   siteDomains: [
     // for transform links in the posts, comments, etc.
     'freefeed.net',
@@ -33,17 +51,11 @@ export default {
     'freefeed.eu.org',
   ],
 
-  textFormatter: {
-    tldList: TLDs,
-    /**
-     * The format is:
-     * [
-     *  { title: "Telegram", linkTpl: "https://t.me/{}", shortCodes: ["tg", "telegram"] },
-     *  { title: "Twitter", linkTpl: "https://twitter.com/{}", shortCodes: ["tw", "twitter"] },
-     *  ...
-     * ]
-     */
-    foreignMentionServices: [],
+  attachments: { maxCount: 20 },
+  maxLength: {
+    post: 3000,
+    comment: 3000,
+    description: 1500,
   },
 
   sentry: {
@@ -172,8 +184,6 @@ export default {
       liberaPayProject: null,
       // yasobe.ru project name
       yasobeRuProject: null,
-      // boosty project name
-      boostyProject: null,
     },
   },
 };

@@ -1,10 +1,10 @@
 /* global CONFIG */
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import cn from 'classnames';
 
-import { faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faChevronDown, faChevronUp, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { htmlSafe } from '../utils';
 import { listHomeFeeds, openSidebar, setUserColorScheme } from '../redux/action-creators';
 import {
@@ -17,16 +17,16 @@ import { bookmarkletHref } from '../bookmarklet/loader';
 import UserName from './user-name';
 import RecentGroups from './recent-groups';
 import ErrorBoundary from './error-boundary';
-import { InvisibleSelect } from './invisible-select';
 import { UserPicture } from './user-picture';
 import { SidebarHomeFeeds } from './sidebar-homefeeds';
 import { ButtonLink } from './button-link';
 import { Throbber } from './throbber';
-import { DonationWidget } from './donation-widget';
 import { useMediaQuery } from './hooks/media-query';
 import { useResizing } from './hooks/resizing';
 import { Icon } from './fontawesome-icons';
 import { SideBarMemories } from './sidebar-memories';
+import { faPenToSquare } from './fontawesome-custom-icons';
+import CreatePost from './create-post';
 
 function LoggedInBlock({ user, signOut }) {
   const signOutStatus = useSelector((state) => state.signOutStatus);
@@ -139,50 +139,39 @@ const SideBarFriends = ({ user }) => {
 };
 
 const SideBarFreeFeed = () => (
-  <div className="box" role="navigation">
-    <div className="box-header-freefeed" role="heading">
-      <Link to="/freefeed">{CONFIG.siteTitle}</Link>
-    </div>
-    <div className="box-body">
-      <ul>
-        <li>
-          <Link to="/search">Search</Link>
-        </li>
-        <li className="p-invites">
-          <Link to="/invite">Invite</Link>
-        </li>
-        <li>
-          <Link to="/filter/everything">Everything</Link>
-        </li>
-        <li>
-          <Link to="/all-groups">Public groups</Link>
-        </li>
-        <li>
-          <Link to="/support">Support</Link> /{' '}
-          <a href="https://github.com/FreeFeed/freefeed-server/wiki/FAQ" target="_blank">
-            FAQ
-          </a>
-        </li>
-        <li>
-          <Link to="/freefeed">News</Link>
-        </li>
-        <li>
-          <Link to="/about/donate">Donate</Link>
-        </li>
-      </ul>
-    </div>
-  </div>
+  <ul>
+    <li>
+      <Link to="/search">Search</Link>
+    </li>
+    <li className="p-invites">
+      <Link to="/invite">Invite</Link>
+    </li>
+    <li>
+      <Link to="/filter/everything">Everything</Link>
+    </li>
+    <li>
+      <Link to="/all-groups">Public groups</Link>
+    </li>
+    <li>
+      <Link to="/support">Support</Link> /{' '}
+      <a href="https://github.com/FreeFeed/freefeed-server/wiki/FAQ" target="_blank">
+        FAQ
+      </a>
+    </li>
+    <li>
+      <Link to="/freefeed">News</Link>
+    </li>
+    <li>
+      <Link to="/about/donate">Donate</Link>
+    </li>
+  </ul>
 );
 
 const SideBarGroups = () => {
   return (
-    <div className="box" role="navigation">
-      <div className="box-header-groups" role="heading">
-        <Link to="/all-groups">Groups</Link>
-      </div>
-      <div className="box-body">
-        <RecentGroups />
-      </div>
+    <div>
+      <RecentGroups />
+
       <div className="box-footer">
         <Link to="/groups">Browse/edit groups</Link>
       </div>
@@ -191,10 +180,7 @@ const SideBarGroups = () => {
 };
 
 const SideBarBookmarklet = () => (
-  <div className="box" role="region">
-    <div className="box-header-groups" role="heading">
-      Bookmarklet
-    </div>
+  <div>
     <div className="box-footer">
       Once added to your toolbar, this button will let you share web pages on {CONFIG.siteTitle}.
       You can even attach thumbnails of images from the page you share!
@@ -235,18 +221,11 @@ const SideBarArchive = ({ user }) => {
     return null;
   }
   return (
-    <div className="box" role="navigation">
-      <div className="box-header-groups" role="heading">
-        FriendFeed.com Archives
-      </div>
-      <div className="box-body">
-        <ul>
-          <li>
-            <Link to="/settings/archive">Restore your archive!</Link>
-          </li>
-        </ul>
-      </div>
-    </div>
+    <ul>
+      <li>
+        <Link to="/settings/archive">Restore your archive!</Link>
+      </li>
+    </ul>
   );
 };
 
@@ -258,39 +237,150 @@ const SideBarAppearance = connect(
   if (!systemColorSchemeSupported && value === SCHEME_SYSTEM) {
     value = SCHEME_LIGHT;
   }
+  function handleRowClick(e) {
+    const rows = document.querySelectorAll('.theme-row');
+    rows.forEach((row) => row.classList.remove('theme-selected'));
+    e.target.classList.add('theme-selected');
+    onChange({ target: { value: e.target.getAttribute('value') } });
+  }
+
+  useEffect(() => {
+    const themeBox = document.querySelector('#theme-box');
+    const children = themeBox.querySelectorAll('.theme-row');
+
+    for (const child of children) {
+      if (child.getAttribute('value') === value) {
+        child.className = 'theme-row theme-selected';
+        break;
+      }
+    }
+  }, [value]);
+
   return (
-    <div className="box" role="region">
-      <div className="box-header-groups" role="heading">
-        Appearance
+    <div id="theme-box">
+      {/* eslint-disable-next-line react/jsx-no-bind */}
+      <div value={SCHEME_LIGHT} className="theme-row" onClick={handleRowClick}>
+        Light
       </div>
-      <div className="box-body">
-        <ul>
-          <li>
-            <div>
-              Color Scheme:{' '}
-              <InvisibleSelect value={value} onChange={onChange} className="color-scheme-selector">
-                <option value={SCHEME_LIGHT}>Light</option>
-                {systemColorSchemeSupported && <option value={SCHEME_SYSTEM}>Auto</option>}
-                <option value={SCHEME_DARK}>Dark</option>
-              </InvisibleSelect>{' '}
-              <span className="color-scheme-hint">
-                {value === SCHEME_LIGHT
-                  ? 'default'
-                  : value === SCHEME_SYSTEM
-                  ? 'as in your OS'
-                  : null}
-              </span>
-            </div>
-          </li>
-        </ul>
+      <div
+        value={SCHEME_SYSTEM}
+        className={`theme-row ${!systemColorSchemeSupported && 'disabled'}`}
+        /* eslint-disable-next-line react/jsx-no-bind */
+        onClick={handleRowClick}
+      >
+        Auto
+      </div>
+      {/* eslint-disable-next-line react/jsx-no-bind */}
+      <div value={SCHEME_DARK} className="theme-row" onClick={handleRowClick}>
+        Dark
       </div>
     </div>
   );
 });
 
+const SideBarNewPost = () => {
+  const newPostDiv = useRef(null);
+  const pointerDiv = useRef(null);
+  const newPostDialog = useRef(null);
+  const [newPost, setNewPost] = useState(false);
+
+  const state = useSelector((state) => state);
+  const sendTo = { ...state.sendTo, defaultFeed: state.user.username };
+  let leftPos; // declare leftPos variable
+
+  if (newPost) {
+    const el = document.querySelector('.footer');
+    leftPos = el.getBoundingClientRect().left; // assign leftPos value
+  }
+
+  const handleHideNewPostDialog = (bool) => {
+    setNewPost(bool);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        newPost &&
+        newPostDialog.current &&
+        !newPostDialog.current.contains(event.target) &&
+        !newPostDiv.current.contains(event.target)
+      ) {
+        setNewPost(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [newPost]);
+
+  return (
+    <div id="newPostDiv" ref={newPostDiv}>
+      <div ref={pointerDiv} id="newPostButtonNull" />
+      <div
+        /* eslint-disable-next-line react/jsx-no-bind */
+        onMouseDown={() => {
+          setNewPost(!newPost);
+        }}
+        id="newPostButtonDesktop"
+      >
+        New Post <Icon icon={faPenToSquare} />
+      </div>
+      {newPost && (
+        <div ref={newPostDialog} className={'new-post'} style={{ left: `${leftPos}px` }}>
+          <CreatePost
+            /* eslint-disable-next-line react/jsx-no-bind */
+            hideNewPostDialog={handleHideNewPostDialog}
+            sendTo={sendTo}
+            user={state.user}
+            createPost={state.createPost}
+            resetPostCreateForm={state.resetPostCreateForm}
+            addAttachmentResponse={state.addAttachmentResponse}
+            showMedia={state.showMedia}
+          />
+        </div>
+      )}
+    </div>
+  );
+};
+
+function CollapsibleSection({ title, collapsed, setCollapsed, children }) {
+  const toggleCollapsed = useCallback(() => {
+    setCollapsed(!collapsed);
+  }, [collapsed, setCollapsed]);
+
+  return (
+    <div
+      style={{ marginBottom: '30px', cursor: 'pointer' }}
+      className="box"
+      role="region"
+      onClick={toggleCollapsed}
+    >
+      <div className="box-header-groups" role="heading">
+        {title}
+        <Icon
+          style={{ position: 'absolute', right: 20, marginTop: '5px' }}
+          icon={collapsed ? faChevronDown : faChevronUp}
+        />
+      </div>
+      {!collapsed && <div className="box-body">{children}</div>}
+    </div>
+  );
+}
+
 export default function SideBar({ user, signOut }) {
   const dispatch = useDispatch();
   const sidebarOpened = useSelector((state) => state.sidebarOpened);
+  const [bookmarkletCollapsed, setBookmarkletCollapsed] = useState(true);
+  const [groupsCollapsed, setGroupsCollapsed] = useState(true);
+  const [archiveCollapsed, setArchiveCollapsed] = useState(true);
+  const [freeFeedCollapsed, setFreeFeedCollapsed] = useState(true);
+  const [memoriesCollapsed, setMemoriesCollapsed] = useState(true);
+  //const state = useSelector((state) => state);
+  // const sendTo = { ...state.sendTo, defaultFeed: state.user.username };
+  //console.log(sendTo);
 
   // Sidebar is 'closed' (actually it is always visible) on the wide screens
   const wideScreen = useMediaQuery('(min-width: 992px)');
@@ -322,7 +412,6 @@ export default function SideBar({ user, signOut }) {
 
   const resizing = useResizing();
   const closeSidebar = useCallback(() => dispatch(openSidebar(false)), [dispatch]);
-
   return (
     <div
       className={cn(
@@ -341,12 +430,44 @@ export default function SideBar({ user, signOut }) {
 
           <LoggedInBlock user={user} signOut={signOut} />
           <SideBarFriends user={user} />
-          <SideBarGroups />
-          <SideBarArchive user={user} />
-          <SideBarFreeFeed />
-          <SideBarBookmarklet />
-          <SideBarMemories />
-          <DonationWidget />
+          <CollapsibleSection
+            title="Groups"
+            collapsed={groupsCollapsed}
+            setCollapsed={setGroupsCollapsed}
+          >
+            <SideBarGroups />
+          </CollapsibleSection>
+          {user.privateMeta && user.privateMeta.archives && (
+            <CollapsibleSection
+              title="Archive"
+              collapsed={archiveCollapsed}
+              setCollapsed={setArchiveCollapsed}
+            >
+              <SideBarArchive user={user} />
+            </CollapsibleSection>
+          )}
+          <CollapsibleSection
+            title="FreeFeed"
+            collapsed={freeFeedCollapsed}
+            setCollapsed={setFreeFeedCollapsed}
+          >
+            <SideBarFreeFeed />
+          </CollapsibleSection>
+          <CollapsibleSection
+            title="Bookmarklet"
+            collapsed={bookmarkletCollapsed}
+            setCollapsed={setBookmarkletCollapsed}
+          >
+            <SideBarBookmarklet />
+          </CollapsibleSection>
+          <CollapsibleSection
+            title="Memories"
+            collapsed={memoriesCollapsed}
+            setCollapsed={setMemoriesCollapsed}
+          >
+            <SideBarMemories />
+          </CollapsibleSection>
+          {wideScreen && <SideBarNewPost />}
           <SideBarAppearance />
         </ErrorBoundary>
       </div>

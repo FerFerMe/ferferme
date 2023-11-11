@@ -8,6 +8,7 @@ import {
   faBookmark as faBookmarkSolid,
   faSignOutAlt,
   faAt,
+  faLanguage,
 } from '@fortawesome/free-solid-svg-icons';
 import {
   faClock,
@@ -36,6 +37,7 @@ export const PostMoreMenu = forwardRef(function PostMoreMenu(
     user,
     post: {
       id: postId,
+      body: body,
       isEditable = false,
       canBeRemovedFrom = [],
       isModeratable = false,
@@ -60,6 +62,9 @@ export const PostMoreMenu = forwardRef(function PostMoreMenu(
     toggleSave,
     fixed = false,
     doMention,
+    doTranslate,
+    undoTranslate,
+    isTranslatable,
   },
   ref,
 ) {
@@ -137,6 +142,24 @@ export const PostMoreMenu = forwardRef(function PostMoreMenu(
         </ButtonLink>
       </div>
     )),
+    [
+      isTranslatable && body !== '' && (
+        <div className={styles.item} key="do-translate">
+          <ButtonLink onClick={doAndClose(doTranslate)} className={styles.link}>
+            <Iconic icon={faLanguage}>Translate</Iconic>
+          </ButtonLink>
+        </div>
+      ),
+    ],
+    [
+      !isTranslatable && body !== '' && (
+        <div className={styles.item} key="undo-translate">
+          <ButtonLink onClick={doAndClose(undoTranslate)} className={styles.link}>
+            <Iconic icon={faLanguage}>Original</Iconic>
+          </ButtonLink>
+        </div>
+      ),
+    ],
     [
       amIAuthenticated && (
         <div className={styles.item} key="save-post">

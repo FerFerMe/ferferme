@@ -1,5 +1,5 @@
 /* global CONFIG */
-import { Component } from 'react';
+import { Component, createRef } from 'react';
 import { Link } from 'react-router';
 import classnames from 'classnames';
 import { connect } from 'react-redux';
@@ -30,6 +30,7 @@ import { CommentProvider } from './post-comment-provider';
 
 class PostComment extends Component {
   commentContainer;
+  commentRef = createRef();
 
   state = {
     moreMenuOpened: false,
@@ -216,6 +217,7 @@ class PostComment extends Component {
               )}
               <span className="comment-tail__action">
                 <PostCommentMore
+                  translateRef={this.commentRef}
                   className="comment-tail__action-link comment-tail__action-link--more"
                   id={this.props.id}
                   authorUsername={this.props.user?.username}

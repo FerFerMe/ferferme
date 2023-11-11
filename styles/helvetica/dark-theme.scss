@@ -429,4 +429,38 @@ body,
     color: $text-color;
     background-color: $bg-color-lighter;
   }
+
+  .mobile-navbar {
+    background-color: #202020;
+
+    .new-post-button {
+      color: #202020;
+      background-color: $link-color;
+      outline-color: $bg-color;
+      box-shadow: 0 4px 6px rgba(248, 248, 248, 0.2);
+
+      &:active {
+        background-color: hsl(35deg, 98%, 66%);
+      }
+    }
+
+    a:link {
+      color: $link-color;
+    }
+
+    a:visited {
+      color: $link-color;
+    }
+
+    a:hover {
+      color: $link-color;
+    }
+  }
+
+  .new-post {
+    background-color: hsl(220deg, 4%, 27%);
+    color: $link-color-dim;
+    box-shadow: 0 4px 6px rgba(248, 248, 248, 0.2);
+    outline-color: $bg-color;
+  }
 }
